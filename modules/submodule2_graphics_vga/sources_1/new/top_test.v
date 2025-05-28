@@ -3,8 +3,7 @@ module top_test(
     input [3:0]i_squeeze_man,
     input i_title,
     input i_gameover,
-    input add,
-    input my_clk,
+    input [3:0]type_block2,
 
     input rst,
     input rst_vga,
@@ -22,30 +21,18 @@ module top_test(
     wire [3:0]R, G, B;
     wire [31:0]div_res;
 
-    reg [3:0] type_block2;
-
     clkdiv clkdiv_inst(
        .clk(clk),
        .rst(rst),
        .div_res(div_res)
     );
 
-    always @(posedge my_clk) begin
-        if(rst) begin
-            type_block2 <= 10'd0;
-        end else if(add) begin
-            type_block2 <= type_block2 + 10'd1;
-        end else begin
-            type_block2 <= type_block2 - 10'd1;
-        end
-
-    end
 
     graphics graphics_inst(
-       .clk(clk),
+       .clk(div_res[1]),
        .i_x_block1(10'd0),
        .i_en_block1(1'b1),
-       .i_x_block2(10'd10),
+       .i_x_block2(10'd15),
        .i_en_block2(1'b1),
        .i_x_man(10'd0),
        .i_y_man(10'd0),
@@ -53,7 +40,7 @@ module top_test(
        .i_x_read(x_read),
        .i_y_read(y_read),
        .i_type_block1(4'd0),
-       .i_type_block2(4'd0),
+       .i_type_block2(type_block2),
        .i_title(i_title),
        .i_gameover(i_gameover),
        .o_r(R),

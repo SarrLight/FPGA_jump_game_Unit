@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="top_test_sim_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="top_test_sim" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="884.493069 us"></ZoomStartTime>
+      <ZoomEndTime time="6,584.493070 us"></ZoomEndTime>
+      <Cursor1Time time="1,834.493069 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="341"></NameColumnWidth>
+      <ValueColumnWidth column_width="159"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="26" />
+   <wvobject fp_name="/top_test_sim/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/rst_vga" type="logic">
+      <obj_property name="ElementShortName">rst_vga</obj_property>
+      <obj_property name="ObjectShortName">rst_vga</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/i_en_block1" type="logic">
+      <obj_property name="ElementShortName">i_en_block1</obj_property>
+      <obj_property name="ObjectShortName">i_en_block1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/i_en_block2" type="logic">
+      <obj_property name="ElementShortName">i_en_block2</obj_property>
+      <obj_property name="ObjectShortName">i_en_block2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/i_squeeze_man" type="array">
+      <obj_property name="ElementShortName">i_squeeze_man[3:0]</obj_property>
+      <obj_property name="ObjectShortName">i_squeeze_man[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/i_title" type="logic">
+      <obj_property name="ElementShortName">i_title</obj_property>
+      <obj_property name="ObjectShortName">i_title</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/i_gameover" type="logic">
+      <obj_property name="ElementShortName">i_gameover</obj_property>
+      <obj_property name="ObjectShortName">i_gameover</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_r" type="array">
+      <obj_property name="ElementShortName">o_r[3:0]</obj_property>
+      <obj_property name="ObjectShortName">o_r[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_g" type="array">
+      <obj_property name="ElementShortName">o_g[3:0]</obj_property>
+      <obj_property name="ObjectShortName">o_g[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_b" type="array">
+      <obj_property name="ElementShortName">o_b[3:0]</obj_property>
+      <obj_property name="ObjectShortName">o_b[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_vs" type="logic">
+      <obj_property name="ElementShortName">o_vs</obj_property>
+      <obj_property name="ObjectShortName">o_vs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_hs" type="logic">
+      <obj_property name="ElementShortName">o_hs</obj_property>
+      <obj_property name="ObjectShortName">o_hs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/x_read" type="array">
+      <obj_property name="ElementShortName">x_read[9:0]</obj_property>
+      <obj_property name="ObjectShortName">x_read[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/y_read" type="array">
+      <obj_property name="ElementShortName">y_read[9:0]</obj_property>
+      <obj_property name="ObjectShortName">y_read[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/R" type="array">
+      <obj_property name="ElementShortName">R[3:0]</obj_property>
+      <obj_property name="ObjectShortName">R[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/G" type="array">
+      <obj_property name="ElementShortName">G[3:0]</obj_property>
+      <obj_property name="ObjectShortName">G[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/B" type="array">
+      <obj_property name="ElementShortName">B[3:0]</obj_property>
+      <obj_property name="ObjectShortName">B[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/div_res" type="array">
+      <obj_property name="ElementShortName">div_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">div_res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_addr_x_img_jump" type="array">
+      <obj_property name="ElementShortName">o_addr_x_img_jump[14:0]</obj_property>
+      <obj_property name="ObjectShortName">o_addr_x_img_jump[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_addr_y_img_jump" type="array">
+      <obj_property name="ElementShortName">o_addr_y_img_jump[14:0]</obj_property>
+      <obj_property name="ObjectShortName">o_addr_y_img_jump[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/hcnt" type="array">
+      <obj_property name="ElementShortName">hcnt[9:0]</obj_property>
+      <obj_property name="ObjectShortName">hcnt[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/vcnt" type="array">
+      <obj_property name="ElementShortName">vcnt[9:0]</obj_property>
+      <obj_property name="ObjectShortName">vcnt[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_dout_ani_jump_0_14" type="array">
+      <obj_property name="ElementShortName">o_dout_ani_jump_0_14[11:0]</obj_property>
+      <obj_property name="ObjectShortName">o_dout_ani_jump_0_14[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_dout_img_block1" type="array">
+      <obj_property name="ElementShortName">o_dout_img_block1[11:0]</obj_property>
+      <obj_property name="ObjectShortName">o_dout_img_block1[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_test_sim/o_dout_img_block2" type="array">
+      <obj_property name="ElementShortName">o_dout_img_block2[11:0]</obj_property>
+      <obj_property name="ObjectShortName">o_dout_img_block2[11:0]</obj_property>
+   </wvobject>
+</wave_config>
