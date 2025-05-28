@@ -1,7 +1,7 @@
 module vga(
     //输入给vga模块的时钟频率是25MHz
 	input		clk_vga,
-    //输入的复位信号
+    //输入的复位信号，高有效
 	input 		rst_vga,
 	//输入的RGB三个值
 	input 		[3:0]	i_r,
