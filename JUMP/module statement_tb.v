@@ -7,7 +7,7 @@ reg [31:0] o_x_man;       // 小人水平坐标
 reg [31:0] o_x_block1;    // 箱子1的X坐标
 reg [31:0] o_x_block2;    // 箱子2的X坐标
 wire [2:0]  state;          // 当前状态码
-wire reload_done;       // 复位信号
+reg reload_done;       // 复位信号
 statement uut(
     .clk_machine(clk_machine),
     .rst_machine(rst_machine),
