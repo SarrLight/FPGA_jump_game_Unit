@@ -35,7 +35,7 @@ always @(posedge clk_random) begin
     if (rst_random) begin
         cnt_random <= 0;
     end else if (i_roll) begin
-        cnt_random <= cnt_random + 1;
+        cnt_random <= cnt_random + 2;//wiwihohoh
     end
 end
 
