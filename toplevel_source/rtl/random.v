@@ -35,7 +35,7 @@ always @(posedge clk_random) begin
     if (rst_random) begin
         cnt_random <= 0;
     end else if (i_roll) begin
-        cnt_random <= cnt_random + 1;
+        cnt_random <= cnt_random + 1;       // 计数器加1
     end
 end
 
@@ -43,7 +43,7 @@ end
 genvar i;
 generate
     for (i = 0; i < WIDTH; i = i + 1) begin
-        assign o_random_binary[i] = cnt_random[WIDTH-1-i];
+        assign o_random_binary[i] = cnt_random[WIDTH-1-i];    // 逆序输出
     end
 endgenerate
 
