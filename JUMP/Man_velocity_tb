@@ -1,10 +1,10 @@
 module Man_velocity_tb();
 reg clk_machine;    // 主时钟 (25MHz)
 reg rst_machine;    // 异步复位 (高有效)
-reg i_btn,          // 玩家按键输入
-reg i_jump_done,    // 物理引擎跳跃完成信号
-reg  [2:0]  state,          // 当前状态码
-wire [7:0]  o_jump_v_init   // 跳跃初速度
+reg i_btn;          // 玩家按键输入
+reg i_jump_done;    // 物理引擎跳跃完成信号
+reg  [2:0]  state;          // 当前状态码
+wire [7:0]  o_jump_v_init;   // 跳跃初速度
 
 Man_velocity uut (
     .clk_machine(clk_machine),
