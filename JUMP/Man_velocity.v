@@ -4,7 +4,7 @@ module Man_velocity(
     input  wire        i_btn,          // 玩家按键输入
     input  wire        i_jump_done,    // 物理引擎跳跃完成信号
     input wire  [2:0]  state,          // 当前状态码
-    output reg  [7:0]  o_jump_v_init   // 跳跃初速度
+    output wire  [7:0]  o_jump_v_init   // 跳跃初速度
 );
 reg  [23:0] cnt_v_init;           // 初速度计数器
 localparam ACCU = 3'd3;  // 蓄力状态

@@ -88,7 +88,7 @@ always @(posedge clk_machine) begin
                 o_x_block2 <= o_x_block2;     // 初始坐标
                 o_en_block2 <= o_en_block2;              // 初始使能信号
                 reload_done <= 1'b0;             // 复位完成信号
-    end
+            end
         endcase
     end
 end

@@ -95,12 +95,6 @@ module top(
         .o_done(jump_done)
     );
 
-    /*
-    landing_judge landing_judge_inst(
-
-    );
-    */
-
     wechat_jump_fsm wechat_jump_fsm_inst(  
         //接收来自top的信号
         .clk_machine(div_res[1]),

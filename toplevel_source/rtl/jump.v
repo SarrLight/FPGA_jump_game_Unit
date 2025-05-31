@@ -23,7 +23,7 @@
 module jump(
     input en,
     input clk_jump,
-    input [10:0] i_v_init,
+    input [10:0] i_v_init,  // 初始速度，当初速度为127时，跳跃高度为256，距离为260
     output [8:0] o_height,
     output reg [10:0] o_dist,
     output reg o_done

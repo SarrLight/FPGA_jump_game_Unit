@@ -23,226 +23,254 @@ module wechat_jump_fsm (
     input  wire        clk_machine,    // 主时钟 (25.175MHz)
     input  wire        rst_machine,    // 异步复位 (高有效)
     input  wire        i_btn,          // 玩家按键输入
+
+    //与jump模块的连接
     input  wire        i_jump_done,    // 物理引擎跳跃完成信号
-    
-    // 位置输入信号
-    input  wire [31:0] i_x_man,        // 当前小人X坐标
-    input  wire [31:0] i_x_block2,     // 当前箱子2的X坐标
     input  wire [31:0] i_jump_dist,
     input  wire [31:0] i_jump_height,
+    output wire  [7:0]  o_jump_v_init,  // 跳跃初速度
+    output reg         o_jump_en,       // 物理引擎使能
+    
+    
     // 状态输出
     output reg  [2:0]  state,          // 当前状态码
     
-    // 箱子控制输出
+    // 输出传递给graphics模块的信号
+    output reg  [31:0] o_x_man,
+    output reg  [31:0] o_y_man,
     output reg  [31:0] o_x_block1,     // 箱子1的X坐标
     output reg  [31:0] o_x_block2,     // 箱子2的X坐标
     output reg         o_en_block2,     // 箱子2显示使能
+    output reg  [4:0]  o_type_index1, // 箱子1种类
+    output reg  [4:0]  o_type_index2, // 箱子2种类
+    /*修改解释：我把原本的color改成了type，因为graphics中block有不同的种类，每一个种类对应一张图片*/
+    //注：箱子种类的有效范围是0~5
+    output wire  [2:0]  o_squeeze_man,  // 小人压扁度 (0-7)
+
+    /*增添解释：输出给graphics模块，表示是否显示标题和游戏结束画面*/
+    output reg o_title,
+    output reg o_gameover
     
-    // 外观控制
-    output reg  [4:0]  o_color_index1, // 箱子1颜色索引
-    output reg  [4:0]  o_color_index2, // 箱子2颜色索引
+    );
+
+    // ================= 状态定义 ================= //
+    localparam INIT = 3'd0;  // 初始化状态 (箱子位置交换)
+    localparam RELD = 3'd1;  // 箱子复位动画
+    localparam WAIT = 3'd2;  // 等待按键状态
+    localparam ACCU = 3'd3;  // 蓄力状态
+    localparam JUMP = 3'd4;  // 跳跃中状态
+    localparam LAND = 3'd5;  // 着陆判定状态
+    localparam OVER = 3'd6;  // 游戏结束状态
+
+    // ================= 常量定义 ================= //
+    localparam ORIGIN         = 32'd0;   // 基准原点坐标
+    localparam ORIGIN_STARTUP = 32'd100;     // INIT状态时，箱子1的初始坐标，待修改
+    localparam BLOCK_WIDTH    = 32'd30;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
+    localparam BLOCK2_OFFSET  = 32'd65;    // 箱子2基础偏移量
+    localparam MAX_SQUEEZE    = 4'd14;     // 最大压扁计数器值，挤压范围是0-14
+
+    // ================= 内部信号 ================= //
+    reg  [16:0] cnt_clk_reload;       // 复位动画计数器
+    reg  [23:0] cnt_v_init;           // 初速度计数器，利用cnt_v_init来记录按键持续的clk周期数
+    //因为小人跳跃初速度和小人的挤压程度有定比关系，所以原本的“压扁时钟时钟和计数器”没有存在的必要
+    reg         reload_done;          // 复位完成标志
+    wire [6:0]  random;               // 用于接受random模块产生的随机数
+    reg new_game;                     // 用于判断是否为新游戏，若为新游戏，则显示标题画面
+
+
+    // 输出赋值
+    assign o_jump_v_init = cnt_v_init[23:17];  // 量化到0-255
+    assign o_squeeze_man = cnt_v_init[23:20];   // 压扁度0-7
+
     
-    // 物理参数
-    output reg  [7:0]  o_jump_v_init,  // 跳跃初速度
-    output reg  [2:0]  o_squeeze_man,  // 小人压扁度 (0-7)
-    output reg         o_jump_en,       // 物理引擎使能
-    output reg  [31:0] o_x_man,
-    output reg  [31:0] o_y_man
-);
-
-// ================= 状态定义 ================= //
-localparam INIT = 3'd0;  // 初始化状态 (箱子位置交换)
-localparam RELD = 3'd1;  // 箱子复位动画
-localparam WAIT = 3'd2;  // 等待按键状态
-localparam ACCU = 3'd3;  // 蓄力状态
-localparam JUMP = 3'd4;  // 跳跃中状态
-localparam LAND = 3'd5;  // 着陆判定状态
-localparam OVER = 3'd6;  // 游戏结束状态
-
-// ================= 常量定义 ================= //
-localparam ORIGIN         = 32'd100;   // 基准原点坐标
-localparam ORIGIN_STARTUP = 32'd0;     // 初始坐标
-localparam JUMP_THRESHOLD = 32'd30;    // 跳跃判定阈值
-localparam BLOCK2_OFFSET  = 32'd65;    // 箱子2基础偏移量
-localparam MAX_SQUEEZE    = 4'd15;     // 最大压扁计数器值
-
-// ================= 内部信号 ================= //
-reg  [16:0] cnt_clk_reload;       // 复位动画计数器
-reg  [23:0] cnt_v_init;           // 初速度计数器
-reg  [19:0] cnt_clk_squeeze;      // 压扁时钟分频
-reg  [3:0]  cnt_squeeze;          // 压扁度计数器
-wire        clk_squeeze;          // 压扁控制时钟 (低频)
-wire        reload_done;          // 复位完成标志
-wire [6:0]  random;               // 随机数输入
-
-// ================= 时钟分频 ================= //
-assign clk_squeeze = cnt_clk_squeeze[19];  // 约192Hz分频
-assign reload_done = (o_x_block1 <= ORIGIN); // 复位完成判断
-random #(7) random_inst (
-    .clk_random(clk_machine),
-    .rst_random(rst_machine),
-    .i_roll(i_btn),
-    .o_random_binary(random)
-);      
-// ================= 状态机核心 ================= //
-always @(posedge clk_machine or posedge rst_machine) begin
-    if (rst_machine) begin
-        // 异步复位初始化
+    //处理复位时的变量初始化
+    always@(posedge rst_machine) begin
         state          <= RELD;
         o_x_block1     <= ORIGIN_STARTUP;
         o_x_block2     <= ORIGIN_STARTUP;
         o_en_block2    <= 1'b0;
-        o_color_index1 <= 5'd17;
-        o_color_index2 <= 5'd0;
+        o_type_index1 <= 5'd5;
+        o_type_index2 <= 5'd0;
         cnt_v_init     <= 24'd0;
-        cnt_squeeze    <= 4'd0;
-        cnt_clk_squeeze<= 20'd0;
         cnt_clk_reload <= 17'd0;
         o_jump_en      <= 1'b0;
         o_x_man        <= ORIGIN_STARTUP;
         o_y_man        <= 32'd0;
-    end else begin
-        // 压扁时钟计数器
-        cnt_clk_squeeze <= cnt_clk_squeeze + 1;
-        
-        // 默认输出
-        o_jump_en <= 1'b0;
-        
-        // 状态转换逻辑
-        case (state)
-            INIT: begin
-                state <= RELD;  // 初始化后立即开始复位动画
-            end
-            
-            RELD: begin
-                if (reload_done || o_x_block1 == ORIGIN) begin
-                    state <= WAIT;
-                end else begin
-                    state <= RELD;
-                end    
-            end
-                                 
-            WAIT: begin
-                if (i_btn) begin
-                    state <= ACCU;
-                end else begin
-                    state <= WAIT;
-                end 
-            end
-                    
-            ACCU: begin
-                if (!i_btn) begin
-                    state <= JUMP;
-                end else begin
-                    state <= ACCU;
-                end    
-            end
-            
-            JUMP: begin
-                if (i_jump_done) begin
-                    state <= LAND;
-                end else begin
-                    state <= JUMP;
-                end    
-            end
-            
-            LAND: begin
-                if (o_x_man <= JUMP_THRESHOLD) begin
-                    state <= WAIT;  // 未跳出当前箱子
-                end else if ((o_x_block2 > o_x_man) ? 
-                          (o_x_block2 - o_x_man <= JUMP_THRESHOLD) : 
-                          (o_x_man - o_x_block2 <= JUMP_THRESHOLD)) begin
-                    state <= INIT;  // 成功跳上下一个箱子
-                end else begin
-                    state <= OVER;   // 跳跃失败
+        new_game       <= 1'b1;
+        o_title        <= 1'b1;
+        o_gameover     <= 1'b0;
+    end
+
+    // ================= 状态机核心 ================= //
+    //处理不同状态之间的切换
+    always @(posedge clk_machine ) begin
+        if (rst_machine) begin           // 复位信号有效时
+            state <= RELD;               // 进入复位动画状态
+        end else begin                 // 复位信号消失时
+            case (state)
+                INIT: begin              
+                    state <= RELD;           // INIT状态默认进入RELD状态
                 end
-            end
-            
-            OVER: begin
-                state <= OVER;  // 保持结束状态
-            end
-            default: begin
-                state <= RELD;  // 异常状态恢复
-            end
-        endcase
-
- // ================= 随机数生成器实例化 ================= //
-
-        // 箱子位置控制
-        case (state)
-            INIT: begin
-                o_x_block1  <= o_x_block2;  // 箱子2变为箱子1
-                o_en_block2 <= 1'b0;        // 隐藏箱子2
-                cnt_clk_reload <= 0;
-            end
-            
-            RELD: begin
-                if (o_x_block1 > ORIGIN) begin
-                    // 箱子1复位动画
-                    if (cnt_clk_reload == 17'h1ffff) begin
-                        o_x_block1  <= o_x_block1 - 1;
-                        cnt_clk_reload <= 0;
-                    end else begin
-                        cnt_clk_reload <= cnt_clk_reload + 1;
+                RELD: begin             // RELD状态下，箱子1左移到指定位置
+                    if(new_game) begin  // 若为新游戏，则在此过程显示标题画面
+                        o_title <= 1'b1;
+                        new_game <= 1'b0;
                     end
-                    o_en_block2 <= 1'b0;
-                end else begin
-                    // 复位完成，生成新箱子2
-                    o_x_block1  <= ORIGIN;
-                    o_x_block2  <= ORIGIN + random + BLOCK2_OFFSET;
-                    o_en_block2 <= 1'b1;
+                    if (reload_done || o_x_block1==ORIGIN) begin // 复位动画结束时或箱子位置正确时
+                        state <= WAIT;      // 进入等待按键状态
+                    end else begin
+                        state <= RELD;      // 箱子未回位，继续复位动画
+                    end
                 end
-            end
-            
-            default: begin
-                // 其他状态保持位置不变
-            end
-        endcase
-        
-        // 箱子颜色控制
-case(state) 
-       INIT:begin
-       o_color_index1 <= o_color_index2;
-       if(o_color_index2 == 17) begin
-       o_color_index2 <= 0;
-       end else begin
-       o_color_index2 <= o_color_index2 + 1;
+                WAIT: begin             // 等待按键状态
+                    if(new_game) begin
+                        new_game <= 1'b0;   //复位动画结束，说明不是新游戏
+                        o_title <= 1'b0;   // 隐藏标题画面
+                    end
+                    
+                    if (i_btn) begin       // 玩家按下按键时，进入蓄力状态
+                        state <= ACCU;  
+                    end
+                end
+                ACCU: begin             // 蓄力状态
+                    if (i_btn) begin    //按下按钮时进入一直处于蓄力中状态
+                        state <= ACCU;
+                    end begin
+                        state <= JUMP;  //松开按钮时进入跳跃中状态
+                    end
+                end
+                JUMP: begin             // 跳跃中状态
+                    if (i_jump_done) begin // 物理引擎跳跃完成时，进入着陆判定状态
+                        state <= LAND;
+                    end else begin
+                        state <= JUMP;      // 跳跃没有完成时，继续跳跃中状态
+                    end
+                end
+                LAND: begin             // 着陆判定状态
+                    if (o_x_man <= BLOCK_WIDTH) begin // 小人未跳出箱子时
+                        state <= WAIT;      // 重新进行按键跳跃
+                    end else if((o_x_man < o_x_block2)?
+                        (o_x_block2-o_x_man <= BLOCK_WIDTH)
+                        :(o_x_man-o_x_block2 <= BLOCK_WIDTH)) begin
+                        state <= INIT;      // 箱子位置交换
+                    end else begin
+                        state <= OVER;      // 游戏结束状态
+                    end
+                end
+                OVER: begin             // 游戏结束状态
+                    state <= OVER;          // 保持当前状态
+                    o_gameover <= 1'b1;    // 显示游戏结束画面
+                end
+                default: begin           // 其他状态
+                    state <= RELD;          // 进入初始化状态
+                end
+            endcase
+        end
+    end
+
+    /*把不同部分写到不同的always语句中，增强可读性*/
+    
+    //随机数生成器实例化
+    random #(7) random_inst (
+        .clk_random(clk_machine),
+        .rst_random(rst_machine),
+        .i_roll(i_btn),
+        .o_random_binary(random)
+    );
+
+    //对两个箱子进行控制
+    always @(posedge clk_machine) begin
+        if (rst_machine) begin
+            o_x_block1 <= ORIGIN_STARTUP;     // 把箱子1和箱子2都放在ORIGIN_STARTUP的位置
+            o_x_block2 <= ORIGIN_STARTUP;     
+            o_en_block2 <= 1'b0;              // 隐藏箱子2
+            reload_done <= 1'b0;             
+            cnt_clk_reload <= 17'd0;          // 复位动画计数器
+        end else begin
+            case (state)
+                INIT: begin
+                    cnt_clk_reload <= 17'd0;
+                    o_x_block1 <= o_x_block2;    // 箱子位置交换
+                    o_x_block2 <= o_x_block2;    // 箱子位置不变
+                    o_en_block2 <= 1'b0;
+                    reload_done <= 1'b0;
+                end
+                RELD: begin
+                    if(o_x_block1 > ORIGIN) begin       // 若箱子1还没有移动到ORIGIN位置
+                        if (cnt_clk_reload == 17'h1ffff) begin // 相当于对clk_machine进行13次分频
+                            cnt_clk_reload <= 17'd0; // 复位计数器
+                            o_x_block1 <= o_x_block1 - 1; // 左移箱子1
+                        end else begin
+                            cnt_clk_reload <= cnt_clk_reload + 1; // 计数器加1
+                            o_x_block1 <= o_x_block1; // 箱子1位置不变
+                        end
+                        o_x_block2 <= o_x_block2;
+                        o_en_block2 <= 1'b0;
+                        reload_done <= 1'b0;
+                    end else begin                    // 若箱子1已经移动到ORIGIN位置
+                        cnt_clk_reload <= 17'd0;
+                        o_x_block1 <= ORIGIN; // 复位箱子1
+                        o_x_block2 <= ORIGIN + random + 65; // 基于初始偏移量和随机数产生箱子2的位置坐标
+                        o_en_block2 <= 1'b1; // 显示箱子2
+                        reload_done <= 1'b1; // 复位完成信号
+                    end
+                end
+                default: begin
+                    cnt_clk_reload <= 17'd0;
+                    o_x_block1 <= o_x_block1;     // 初始坐标
+                    o_x_block2 <= o_x_block2;     // 初始坐标
+                    o_en_block2 <= o_en_block2;      // 初始使能信号
+                    reload_done <= 1'b0;             // 复位完成信号
+                end
+            endcase
+        end
+    end
+    
+    // 对箱子种类进行控制
+    always@(posedge clk_machine) begin
+        case(state) 
+            INIT:begin
+                o_type_index1 <= o_type_index2;
+                if(o_type_index2 == 5) begin        //箱子种类的范围是0~5
+                    o_type_index2 <= 0;
+                end else begin
+                    o_type_index2 <= o_type_index2 + 1;
                 end 
             end 
+            
             default:begin
+                o_type_index1 <= o_type_index1;
+                o_type_index2 <= o_type_index2;
             end 
-          endcase
- // 初速度控制
-       case (state)
-            ACCU: begin
-                if (i_btn && cnt_v_init < 24'hffffff) begin
-                    cnt_v_init <= cnt_v_init + 1;
-                end
-            end
-            
-            JUMP: begin
-                if (i_jump_done) begin
-                    cnt_v_init <= 0;
-                end
-            end
-            
-            default: begin
-                if (i_jump_done) begin
-                    cnt_v_init <= 0;
-                end
-            end    
         endcase
-        
-        // 压扁度控制
-        if (state == ACCU) begin
-            if (cnt_squeeze < MAX_SQUEEZE) begin
-                cnt_squeeze <= cnt_squeeze + 1;
-            end
+    end
+    
+    //根据按键信号改变小人跳跃初速度
+    always @(posedge clk_machine) begin
+        if (rst_machine) begin
+            cnt_v_init <= 0;
         end else begin
-            cnt_squeeze <= 0;
+            case(state)
+                ACCU: begin
+                    if (i_btn && cnt_v_init < 24'hffffff) begin //利用cnt_v_init来记录按键持续的clk周期数
+                        cnt_v_init <= cnt_v_init + 1;
+                    end else begin
+                        cnt_v_init <= cnt_v_init;
+                    end
+                end
+                JUMP: begin
+                    if (i_jump_done) begin
+                        cnt_v_init <= 0;
+                    end else begin
+                        cnt_v_init <= cnt_v_init;
+                    end
+                end
+            endcase
         end
-        
-        // 角色位置控制
+    end
+
+    // 角色位置控制
+    always@(posedge clk_machine) begin
         case (state)
             INIT: begin
                 o_x_man <= o_x_block2;
@@ -256,7 +284,7 @@ case(state)
             
             JUMP: begin
                 o_x_man <= i_jump_dist;
-                o_y_man <= i_jump_height << 2;
+                o_y_man <= i_jump_height;
             end
             
             LAND, OVER: begin
@@ -268,10 +296,9 @@ case(state)
                 o_y_man <= 0;
             end
         endcase
-        
-// 输出赋值
-assign o_jump_v_init = cnt_v_init[23:17];  // 量化到0-255
-assign o_squeeze_man = cnt_squeeze[3:1];   // 压扁度0-7
     end
-end
+            
+    
+
+
 endmodule
