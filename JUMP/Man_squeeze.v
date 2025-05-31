@@ -2,10 +2,10 @@ module Man_squeeze(
     input  wire        clk_machine,    // 主时钟 (25MHz)
     input  wire        rst_machine,    // 异步复位 (高有效)
     input  wire [2:0]  state,          // 当前状态码
-    output wire        o_squeeze_man,    // 压缩度计数器输出
+    output wire        o_squeeze_man    // 压缩度计数器输出
 );
-wire [19:0] cnt_clk_squeeze;  // 时钟计数器
-wire [3:0] cnt_squeeze;       // 压缩度计数器
+reg [19:0] cnt_clk_squeeze;  // 时钟计数器
+reg [3:0] cnt_squeeze;       // 压缩度计数器
 wire clk_squeeze;            // 时钟信号
 localparam ACCU = 3'd3;  // 蓄力状态
 assign o_squeeze_man = cnt_squeeze[3:1]; 
