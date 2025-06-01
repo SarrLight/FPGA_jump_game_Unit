@@ -123,14 +123,14 @@ module graphics(
     assign addr_img_gameover =  addr_y_img_gameover*17'd433 + addr_x_img_gameover;
 
     //将man，block1，block2的坐标转换到屏幕坐标
-    assign screen_x_man = 10'd237+10'd7*i_x_man;
-    assign screen_y_man = 10'd337+10'd8*i_y_man-10'd4*i_x_man;
+    assign screen_x_man = 10'd237+i_x_man;
+    assign screen_y_man = 10'd337-i_y_man-i_x_man*4/7;
 
-    assign screen_x_block1 = 10'd237+10'd7*i_x_block1;
-    assign screen_y_block1 = 10'd337-10'd4*i_x_block1;
+    assign screen_x_block1 = 10'd237+i_x_block1;
+    assign screen_y_block1 = 10'd337-i_x_block1*4/7;
 
-    assign screen_x_block2 = 10'd237+10'd7*i_x_block2;
-    assign screen_y_block2 = 10'd337-10'd4*i_x_block2;
+    assign screen_x_block2 = 10'd237+i_x_block2;
+    assign screen_y_block2 = 10'd337-i_x_block2*4/7;
 
 
     ani_jump_0_14 ani_jump_0_14_inst(

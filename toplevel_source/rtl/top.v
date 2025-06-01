@@ -49,7 +49,6 @@ module top(
     wire [3:0] type_block1;
     wire [3:0] type_block2;
 
-    wire en_block1;
     wire en_block2;
 
     //小人的压缩程度，有效范围是0-14 对应压缩0~100%
@@ -88,7 +87,7 @@ module top(
 
     jump jump_inst(
         .en(jump_en),
-        .clk_jump(div_res[1]),      //此处分频次数需根据实际情况调大
+        .clk_jump(div_res[18]),      //此处分频次数需根据实际情况调大
         .i_v_init(jump_v_init),
         .o_height(jump_height),
         .o_dist(jump_dist),
@@ -99,7 +98,7 @@ module top(
         //接收来自top的信号
         .clk_machine(div_res[1]),
         .rst_machine(rst),  //异步复位，高有效
-        .i_bt(i_bt),
+        .i_btn(i_bt),
 
         //输出传递给graphics模块的信号
         .o_x_man(x_man),
@@ -108,7 +107,6 @@ module top(
         .o_x_block2(x_block2),
         .o_type_block1(type_block1),
         .o_type_block2(type_block2),
-        .o_en_block1(en_block1),
         .o_en_block2(en_block2),
         .o_squeeze_man(squeeze_man),
         .o_title(title),
@@ -129,7 +127,7 @@ module top(
 
        //接收来自wechat_jump_fsm的信号
        .i_x_block1(x_block1),
-       .i_en_block1(en_block1),
+       .i_en_block1(1'b1),
        .i_x_block2(x_block2),
        .i_en_block2(en_block2),
        .i_x_man(x_man),

@@ -24,35 +24,35 @@ module wechat_jump_fsm_tb( );
     
     /*
     module wechat_jump_fsm (
-    // åŸºç¡€æ§åˆ¶ä¿¡å·
-    input  wire        clk_machine,    // ä¸»æ—¶é’Ÿ (25.175MHz)
-    input  wire        rst_machine,    // å¼‚æ­¥å¤ä½ (é«˜æœ‰æ•ˆ)
-    input  wire        i_btn,          // ç©å®¶æŒ‰é”®è¾“å…¥
+    // »ù´¡¿ØÖÆĞÅºÅ
+    input  wire        clk_machine,    // Ö÷Ê±ÖÓ (25.175MHz)
+    input  wire        rst_machine,    // Òì²½¸´Î» (¸ßÓĞĞ§)
+    input  wire        i_btn,          // Íæ¼Ò°´¼üÊäÈë
 
-    //ä¸jumpæ¨¡å—çš„è¿æ¥
-    input  wire        i_jump_done,    // ç‰©ç†å¼•æ“è·³è·ƒå®Œæˆä¿¡å·
+    //ÓëjumpÄ£¿éµÄÁ¬½Ó
+    input  wire        i_jump_done,    // ÎïÀíÒıÇæÌøÔ¾Íê³ÉĞÅºÅ
     input  wire [10:0] i_jump_dist,
     input  wire [8:0] i_jump_height,
-    output wire  [10:0]  o_jump_v_init,  // è·³è·ƒåˆé€Ÿåº¦
-    output reg         o_jump_en,       // ç‰©ç†å¼•æ“ä½¿èƒ½
+    output wire  [10:0]  o_jump_v_init,  // ÌøÔ¾³õËÙ¶È
+    output reg         o_jump_en,       // ÎïÀíÒıÇæÊ¹ÄÜ
     
     
-    // çŠ¶æ€è¾“å‡º
-    output reg  [2:0]  state,          // å½“å‰çŠ¶æ€ç 
+    // ×´Ì¬Êä³ö
+    output reg  [2:0]  state,          // µ±Ç°×´Ì¬Âë
     
-    // è¾“å‡ºä¼ é€’ç»™graphicsæ¨¡å—çš„ä¿¡å·
-    output reg  [31:0] o_x_man,
-    output reg  [31:0] o_y_man,
-    output reg  [31:0] o_x_block1,     // ç®±å­1çš„Xåæ ‡
-    output reg  [31:0] o_x_block2,     // ç®±å­2çš„Xåæ ‡
-    output reg         o_en_block2,     // ç®±å­2æ˜¾ç¤ºä½¿èƒ½
-    output reg  [4:0]  o_type_index1, // ç®±å­1ç§ç±»
-    output reg  [4:0]  o_type_index2, // ç®±å­2ç§ç±»
-    //ä¿®æ”¹è§£é‡Šï¼šæˆ‘æŠŠåŸæœ¬çš„coloræ”¹æˆäº†typeï¼Œå› ä¸ºgraphicsä¸­blockæœ‰ä¸åŒçš„ç§ç±»ï¼Œæ¯ä¸€ä¸ªç§ç±»å¯¹åº”ä¸€å¼ å›¾ç‰‡
-    //æ³¨ï¼šç®±å­ç§ç±»çš„æœ‰æ•ˆèŒƒå›´æ˜¯0~5
-    output wire  [3:0]  o_squeeze_man,  // å°äººå‹æ‰åº¦ (0-14)
+    // Êä³ö´«µİ¸øgraphicsÄ£¿éµÄĞÅºÅ
+    output reg  [9:0] o_x_man,
+    output reg  [9:0] o_y_man,
+    output reg  [9:0] o_x_block1,     // Ïä×Ó1µÄX×ø±ê
+    output reg  [9:0] o_x_block2,     // Ïä×Ó2µÄX×ø±ê
+    output reg         o_en_block2,     // Ïä×Ó2ÏÔÊ¾Ê¹ÄÜ
+    output reg  [3:0]  o_type_block1, // Ïä×Ó1ÖÖÀà
+    output reg  [3:0]  o_type_block2, // Ïä×Ó2ÖÖÀà
+    //ĞŞ¸Ä½âÊÍ£ºÎÒ°ÑÔ­±¾µÄcolor¸Ä³ÉÁËtype£¬ÒòÎªgraphicsÖĞblockÓĞ²»Í¬µÄÖÖÀà£¬Ã¿Ò»¸öÖÖÀà¶ÔÓ¦Ò»ÕÅÍ¼Æ¬
+    //×¢£ºÏä×ÓÖÖÀàµÄÓĞĞ§·¶Î§ÊÇ0~5
+    output wire  [3:0]  o_squeeze_man,  // Ğ¡ÈËÑ¹±â¶È (0-14)
 
-    //å¢æ·»è§£é‡Šï¼šè¾“å‡ºç»™graphicsæ¨¡å—ï¼Œè¡¨ç¤ºæ˜¯å¦æ˜¾ç¤ºæ ‡é¢˜å’Œæ¸¸æˆç»“æŸç”»é¢
+    //ÔöÌí½âÊÍ£ºÊä³ö¸øgraphicsÄ£¿é£¬±íÊ¾ÊÇ·ñÏÔÊ¾±êÌâºÍÓÎÏ·½áÊø»­Ãæ
     output reg o_title,
     output reg o_gameover
     
@@ -68,16 +68,32 @@ module wechat_jump_fsm_tb( );
     wire [10:0] o_jump_v_init;
     wire o_jump_en;
     wire [2:0] state;
-    wire [31:0] o_x_man;
-    wire [31:0] o_y_man;
-    wire [31:0] o_x_block1;
-    wire [31:0] o_x_block2;
+    wire [9:0] o_x_man;
+    wire [9:0] o_y_man;
+    wire [9:0] o_x_block1;
+    wire [9:0] o_x_block2;
     wire o_en_block2;
-    wire [4:0] o_type_index1;
-    wire [4:0] o_type_index2;
+    wire [3:0] o_type_block1;
+    wire [3:0] o_type_block2;
     wire [3:0] o_squeeze_man;
     wire o_title;
     wire o_gameover;
+
+    wire [31:0] div_res;
+
+    /*
+    module clkdiv(clk,rst,div_res);
+    input   clk;
+    input   rst;
+    output reg [31:0] div_res;
+    */
+
+    clkdiv clkdiv_inst(
+        .clk(clk_machine),
+        .rst(rst_machine),
+        .div_res(div_res)
+    );
+
 
 
 
@@ -96,8 +112,8 @@ module wechat_jump_fsm_tb( );
         .o_x_block1(o_x_block1),
         .o_x_block2(o_x_block2),
         .o_en_block2(o_en_block2),
-        .o_type_index1(o_type_index1),
-        .o_type_index2(o_type_index2),
+        .o_type_block1(o_type_block1),
+        .o_type_block2(o_type_block2),
         .o_squeeze_man(o_squeeze_man),
         .o_title(o_title),
         .o_gameover(o_gameover)
@@ -107,7 +123,7 @@ module wechat_jump_fsm_tb( );
     module jump(
         input en,
         input clk_jump,
-        input [10:0] i_v_init,  // åˆå§‹é€Ÿåº¦ï¼Œå½“åˆé€Ÿåº¦ä¸º127æ—¶ï¼Œè·³è·ƒé«˜åº¦ä¸º256ï¼Œè·ç¦»ä¸º260
+        input [10:0] i_v_init,  // ³õÊ¼ËÙ¶È£¬µ±³õËÙ¶ÈÎª127Ê±£¬ÌøÔ¾¸ß¶ÈÎª256£¬¾àÀëÎª260
         output [8:0] o_height,
         output reg [10:0] o_dist,
         output reg o_done
@@ -116,14 +132,14 @@ module wechat_jump_fsm_tb( );
 
     jump jump_inst(
         .en(o_jump_en),
-        .clk_jump(clk_machine),
+        .clk_jump(div_res[17]),
         .i_v_init(o_jump_v_init),
         .o_height(i_jump_height),
         .o_dist(i_jump_dist),
         .o_done(i_jump_done)
     );
 
-    // ä¿¡å·åˆå§‹åŒ–
+    // ĞÅºÅ³õÊ¼»¯
     initial begin
         clk_machine = 0;
         forever #5 clk_machine = ~clk_machine;
