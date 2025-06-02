@@ -26,4 +26,7 @@ set_property PACKAGE_PIN AE12 [get_ports rst]
 set_property IOSTANDARD LVCMOS15 [get_ports i_bt]
 set_property IOSTANDARD LVCMOS15 [get_ports rst]
 
+set_property PACKAGE_PIN AF25 [get_ports o_buzzer]
+set_property IOSTANDARD LVCMOS33 [get_ports o_buzzer]
+
 

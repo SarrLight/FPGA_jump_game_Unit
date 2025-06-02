@@ -2,12 +2,12 @@ module graphics(
     input       clk,                    //时钟信号
 
     //来自于machine的输入
-    input       [9:0]i_x_block1,        //箱子1的x坐标
+    input       [10:0]i_x_block1,        //箱子1的x坐标
     input       i_en_block1,            //箱子1是否显示
-    input       [9:0]i_x_block2,        //箱子2的x坐标
+    input       [10:0]i_x_block2,        //箱子2的x坐标
     input       i_en_block2,            //箱子2是否显示
-    input       [9:0]i_x_man,           //人物的x坐标
-    input       [9:0]i_y_man,           //人物的y坐标
+    input       [10:0]i_x_man,           //人物的x坐标
+    input       [10:0]i_y_man,           //人物的y坐标
     input       [3:0]i_squeeze_man,     //人物的压缩程度 0~14 对应压缩0~100%
     input       [3:0]i_type_block1,     //箱子1的图像种类 0~5
     input       [3:0]i_type_block2,     //箱子2的图像种类 0~5
@@ -15,8 +15,8 @@ module graphics(
     input       i_title,                //是否显示游戏标题
 
     //来自于vga的输入
-    input       [9:0]i_x_read,          //正在读取的x坐标
-    input       [9:0]i_y_read,          //正在读取的y坐标
+    input       [10:0]i_x_read,          //正在读取的x坐标
+    input       [10:0]i_y_read,          //正在读取的y坐标
     
     //传递给vga的输出，分别输出当前读取的像素点的rgb值
     output   reg   [3:0]o_r,
@@ -54,12 +54,12 @@ module graphics(
     wire [16:0] addr_img_gameover;
     wire [11:0] dout_img_gameover;
 
-    wire [9:0]  screen_x_man;
-    wire [9:0]  screen_y_man;
-    wire [9:0]  screen_x_block1;
-    wire [9:0]  screen_y_block1;
-    wire [9:0]  screen_x_block2;
-    wire [9:0]  screen_y_block2;
+    wire [10:0]  screen_x_man;
+    wire [10:0]  screen_y_man;
+    wire [10:0]  screen_x_block1;
+    wire [10:0]  screen_y_block1;
+    wire [10:0]  screen_x_block2;
+    wire [10:0]  screen_y_block2;
 
     wire [14:0] addr_img_block1_mark;
     wire [14:0] addr_img_block2_mark;
@@ -75,21 +75,22 @@ module graphics(
     wire en_title;
     wire en_gameover;
 
-    assign en_block1 = i_en_block1 && addr_x_img_block1>=15'd0 && addr_x_img_block1<15'd180 
+    //解释我为什么是大于0而不是大于等于零，因为0的时候输出的图形由上一个clk的dout决定，所以把他舍弃了
+    assign en_block1 = i_en_block1 && addr_x_img_block1>15'd0 && addr_x_img_block1<15'd180 
         && addr_y_img_block1>=15'd0 && addr_y_img_block1<15'd180;
-    assign en_block2 = i_en_block2 && addr_x_img_block2>=15'd0 && addr_x_img_block2<15'd180 
+    assign en_block2 = i_en_block2 && addr_x_img_block2>15'd0 && addr_x_img_block2<15'd180 
         && addr_y_img_block2>=15'd0 && addr_y_img_block2<15'd180;
     assign en_man = addr_x_img_jump>=17'd0 && addr_x_img_jump<17'd50 
-        && addr_y_img_jump>=17'd0 && addr_y_img_jump<17'd100;
+        && addr_y_img_jump>17'd0 && addr_y_img_jump<17'd100;
     assign en_title = i_title && addr_x_img_title>=0 && addr_x_img_title<493 
-        && addr_y_img_title>=0 && addr_y_img_title<144;
+        && addr_y_img_title>0 && addr_y_img_title<144;
     assign en_gameover = i_gameover && addr_x_img_gameover>=0 && addr_x_img_gameover<433 
-        && addr_y_img_gameover>=0 && addr_y_img_gameover<109;
+        && addr_y_img_gameover>0 && addr_y_img_gameover<109;
 
     //将读到的坐标转换到ani_jump_0_14的地址
     //man的屏幕坐标对应到img_jump的地址是（25，91）
-    assign addr_x_img_jump = {7'd0,i_x_read-screen_x_block1+10'd25};
-    assign addr_y_img_jump = {7'd0,i_y_read-screen_y_man+10'd91};
+    assign addr_x_img_jump = {6'd0,i_x_read-screen_x_man+11'd25};
+    assign addr_y_img_jump = {6'd0,i_y_read-screen_y_man+11'd91};
     assign addr_img_jump =  addr_y_img_jump*17'd50
         + addr_x_img_jump;
     //ani_jump_0_14每一帧的数据量是5000个像素点（50*100）
@@ -99,10 +100,10 @@ module graphics(
     //将读到的坐标转换到img_block上的地址
     //block1的屏幕坐标对应到img_block1的地址是（108，71）
     
-    assign addr_x_img_block1 = {5'd0,i_x_read-screen_x_block1+10'd108};
-    assign addr_y_img_block1 = {5'd0,i_y_read-screen_y_block1+10'd71};
-    assign addr_x_img_block2 = {5'd0,i_x_read-screen_x_block2+10'd108};
-    assign addr_y_img_block2 = {5'd0,i_y_read-screen_y_block2+10'd71};
+    assign addr_x_img_block1 = {4'd0,i_x_read-screen_x_block1+11'd108};
+    assign addr_y_img_block1 = {4'd0,i_y_read-screen_y_block1+11'd71};
+    assign addr_x_img_block2 = {4'd0,i_x_read-screen_x_block2+11'd108};
+    assign addr_y_img_block2 = {4'd0,i_y_read-screen_y_block2+11'd71};
 
 
     assign addr_img_block1_mark = addr_y_img_block1*15'd180 
@@ -123,62 +124,62 @@ module graphics(
     assign addr_img_gameover =  addr_y_img_gameover*17'd433 + addr_x_img_gameover;
 
     //将man，block1，block2的坐标转换到屏幕坐标
-    assign screen_x_man = 10'd237+i_x_man;
-    assign screen_y_man = 10'd337-i_y_man-i_x_man*4/7;
+    assign screen_x_man = 11'd237+i_x_man;
+    assign screen_y_man = 11'd337-i_y_man-i_x_man*4/7;
 
-    assign screen_x_block1 = 10'd237+i_x_block1;
-    assign screen_y_block1 = 10'd337-i_x_block1*4/7;
+    assign screen_x_block1 = 11'd237+i_x_block1;
+    assign screen_y_block1 = 11'd337-i_x_block1*4/7;
 
-    assign screen_x_block2 = 10'd237+i_x_block2;
-    assign screen_y_block2 = 10'd337-i_x_block2*4/7;
+    assign screen_x_block2 = 11'd237+i_x_block2;
+    assign screen_y_block2 = 11'd337-i_x_block2*4/7;
 
 
     ani_jump_0_14 ani_jump_0_14_inst(
         .clka(clk),
-        .ena(en_man),               //通过使能信号来避免干扰
+        //.ena(en_man),               //不使用使能信号来避免延迟
         .addra(addr_ani_jump_0_14),
         .douta(dout_ani_jump_0_14)
     );
 
     ani_jump_mark_0_14 ani_jump_mark_0_14_inst(
+        //.ena(en_man),               //不使用使能信号来避免延迟
         .clka(clk),
-        .ena(en_man),               //通过使能信号来避免干扰
         .addra(addr_ani_jump_0_14),
         .douta(dout_ani_jump_mark_0_14)
     );
 
     img_block_0_5 img_block_0_5_inst(
         .clka(clk),
-        .ena(en_block1),
+        //.ena(en_block1),
         .addra(addr_img_block1),
         .douta(dout_img_block1),
         .clkb(clk),
-        .enb(en_block2),
+        //.enb(en_block2),
         .addrb(addr_img_block2),
         .doutb(dout_img_block2)
     );
 
     img_block_mark img_block_mark_inst(
         .clka(clk),
-        .ena(en_block1),
+        //.ena(en_block1),
         .addra(addr_img_block1_mark),
         .douta(dout_img_block1_mark),
         .clkb(clk),
-        .enb(en_block2),
+        //.enb(en_block2),
         .addrb(addr_img_block2_mark),
         .doutb(dout_img_block2_mark)
     );
 
     img_title img_title_inst(
         .clka(clk),
-        .ena(en_title),
+        //.ena(en_title),
         .addra(addr_img_title),
         .douta(dout_img_title)
     );
 
     img_gameover img_gameover_inst(
         .clka(clk),
-        .ena(en_gameover),
+        //.ena(en_gameover),
         .addra(addr_img_gameover),
         .douta(dout_img_gameover)
     );

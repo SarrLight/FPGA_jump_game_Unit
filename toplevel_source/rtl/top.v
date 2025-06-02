@@ -32,7 +32,10 @@ module top(
     output wire o_hs,
     output wire [3:0] o_r,
     output wire [3:0] o_g,
-    output wire [3:0] o_b
+    output wire [3:0] o_b,
+
+    //buzzer接口
+    output o_buzzer
 
     );
 
@@ -40,11 +43,11 @@ module top(
     //分频器的分频结果
     wire [31:0] div_res;
     //小人的x，y坐标
-    wire [9:0] x_man;
-    wire [9:0] y_man;
+    wire [10:0] x_man;
+    wire [10:0] y_man;
     //block1和block2的x坐标
-    wire [9:0] x_block1;
-    wire [9:0] x_block2;
+    wire [10:0] x_block1;
+    wire [10:0] x_block2;
     //block1和block2的类型，有效范围是0-5
     wire [3:0] type_block1;
     wire [3:0] type_block2;
@@ -55,8 +58,8 @@ module top(
     wire [3:0] squeeze_man;
 
     //当前读取的x，y坐标，由vga模块输出，输入给graphics模块
-    wire [9:0] x_read;
-    wire [9:0] y_read;
+    wire [10:0] x_read;
+    wire [10:0] y_read;
 
     //graphics模块的输出的当前读取像素的颜色，输入给vga模块
     wire [3:0] R;
@@ -75,7 +78,7 @@ module top(
     //小人跳跃的距离，有效范围暂不确定
     wire [10:0] jump_dist;
     //小人跳跃的初始速度，有效范围暂不确定
-    wire [7:0] jump_v_init; 
+    wire [10:0] jump_v_init; 
 
     //32位的计数器，作为分频器
     clkdiv clkdiv_inst(
@@ -164,6 +167,13 @@ module top(
         .o_vga_r(o_r),
         .o_vga_g(o_g),
         .o_vga_b(o_b)
+    );
+
+    Buzzer buzzer_inst(
+        .clk(clk),
+        .rst_n(1'b1),
+        .music_scale(squeeze_man/2),
+        .beep(o_buzzer)
     );
 
 

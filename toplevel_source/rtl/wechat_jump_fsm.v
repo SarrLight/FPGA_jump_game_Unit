@@ -36,10 +36,10 @@ module wechat_jump_fsm (
     output reg  [2:0]  state,          // 当前状态码
     
     // 输出传递给graphics模块的信号
-    output reg  [9:0] o_x_man,
-    output reg  [9:0] o_y_man,
-    output reg  [9:0] o_x_block1,     // 箱子1的X坐标
-    output reg  [9:0] o_x_block2,     // 箱子2的X坐标
+    output reg  [10:0] o_x_man,
+    output reg  [10:0] o_y_man,
+    output reg  [10:0] o_x_block1,     // 箱子1的X坐标
+    output reg  [10:0] o_x_block2,     // 箱子2的X坐标
     output reg         o_en_block2,     // 箱子2显示使能
     output reg  [3:0]  o_type_block1, // 箱子1种类
     output reg  [3:0]  o_type_block2, // 箱子2种类
@@ -67,7 +67,7 @@ module wechat_jump_fsm (
     localparam ORIGIN         = 32'd0;   // 基准原点坐标
     localparam ORIGIN_STARTUP = 32'd100;     // INIT状态时，箱子1的初始坐标，待修改
     localparam BLOCK_WIDTH    = 32'd30;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
-    localparam BLOCK2_OFFSET  = 32'd260;    // 箱子2基础偏移量
+    localparam BLOCK2_OFFSET  = 32'd240;    // 箱子2基础偏移量
     localparam MAX_SQUEEZE    = 4'd14;     // 最大压扁计数器值，挤压范围是0-14
 
     // ================= 内部信号 ================= //

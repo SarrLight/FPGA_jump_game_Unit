@@ -8,8 +8,8 @@ module vga(
 	input 		[3:0]	i_g,
 	input 		[3:0] 	i_b,
 	//输出当前读取的像素点的屏幕坐标，模块外部根据这个坐标来传递RGB值, x代表水平方向，y代表垂直方向
-	output reg	[9:0]	o_x,
-	output reg	[9:0] 	o_y,
+	output reg	[10:0]	o_x,
+	output reg	[10:0] 	o_y,
 	//输出的垂直同步信号，top模块将它们输出给vga接口
 	output		o_vga_vs,
 	output 		o_vga_hs,
@@ -66,8 +66,8 @@ module vga(
 
     always @(*) begin
         if(rst_vga) begin
-            o_x <= 10'b0;
-            o_y <= 10'b0;
+            o_x <= 11'b0;
+            o_y <= 11'b0;
             rgb_en <= 1'b0;
         end else if(hcnt >= H_SYNC_PW+H_L_PORCH && hcnt < H_SYNC_PW+H_L_PORCH+H_VISIBLE 
         && vcnt >= V_SYNC_PW+V_T_PORCH && vcnt < V_SYNC_PW+V_T_PORCH+V_VISIBLE) begin
