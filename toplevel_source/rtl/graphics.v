@@ -54,6 +54,8 @@ module graphics(
     wire [16:0] addr_img_gameover;
     wire [11:0] dout_img_gameover;
 
+    wire [11:0] dout_img_gameover_mark;
+
     wire [10:0]  screen_x_man;
     wire [10:0]  screen_y_man;
     wire [10:0]  screen_x_block1;
@@ -184,6 +186,12 @@ module graphics(
         .douta(dout_img_gameover)
     );
 
+    img_gameover_mark img_gameover_mark_inst(
+        .clka(clk),
+        .addra(addr_img_gameover),
+        .douta(dout_img_gameover_mark)
+    );
+
     always@(posedge clk) begin
         
         //依次绘制不同的图层，更高的图层会把低层的图层覆盖掉
@@ -211,7 +219,7 @@ module graphics(
         //第五层： “跳一跳”标题
         if(en_title) begin
             {o_r, o_g, o_b}<=dout_img_title;
-        end else if(en_gameover) begin       //第六层：“游戏结束”标题
+        end else if(en_gameover && dout_img_gameover_mark[3:0]>4'h5) begin       //第六层：“游戏结束”标题
             {o_r, o_g, o_b}<=dout_img_gameover;
         end
         

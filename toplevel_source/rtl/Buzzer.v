@@ -20,11 +20,14 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Buzzer(clk, rst_n, beep, music_scale);
-    input clk;
-    input rst_n;        //同步复位信号(低电平有效)
-    input [5:0] music_scale;
-    output reg beep;
+module Buzzer(
+    input clk,
+    input rst_n,        //同步复位信号(低电平有效)
+    input [5:0] music_scale,
+    output reg beep,
+    input i_load_done   //小人正确落到箱子上的标志
+);
+    
 
     parameter SPEED = 4;    //控制演奏的速度，如果是4，频率是4Hz
     //原始的clk频率是50Mhz
@@ -60,6 +63,8 @@ module Buzzer(clk, rst_n, beep, music_scale);
     
     reg [23:0] cnt_6m;
     reg clk_6m;
+    reg playing_load_audio;
+    reg [31:0] cnt_load_audio;
 
     always@(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -104,10 +109,11 @@ module Buzzer(clk, rst_n, beep, music_scale);
     end
 
     //在clk_SPEED上计时，根据music_scale选择对应的音调， 当SPEED为4时，每个音调都至少持续0.25s
-    always @(posedge clk_SPEED or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             cnt_hz <= REST;
         end else begin
+            
             case(music_scale)
                 0: cnt_hz <= REST;
                 1: cnt_hz <= C_LOW;
@@ -133,6 +139,27 @@ module Buzzer(clk, rst_n, beep, music_scale);
                 21: cnt_hz <= B_HIGH;
                 default: cnt_hz <= REST;
             endcase
+
+            if(playing_load_audio) begin
+                cnt_hz <= C_LOW;
+            end
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        
+        if(!rst_n) begin
+            playing_load_audio <= 0;
+            cnt_load_audio <= 0;
+        end else if(i_load_done) begin
+            playing_load_audio <= 1;
+            cnt_load_audio <= 0;
+        end else if(playing_load_audio) begin
+            if(cnt_load_audio[21]) begin
+                playing_load_audio <= 0;
+            end else begin
+                cnt_load_audio <= cnt_load_audio + 1;
+            end
         end
     end
 

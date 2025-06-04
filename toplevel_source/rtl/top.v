@@ -112,8 +112,8 @@ module top(
         .o_type_block2(type_block2),
         .o_en_block2(en_block2),
         .o_squeeze_man(squeeze_man),
-        .o_title(title),
-        .o_gameover(gameover),
+        .o_title(title),    //是否显示游戏标题“跳一跳”，1为显示，0为不显示
+        .o_gameover(gameover),    //是否显示游戏结束画面，1为显示，0为不显示
 
         //与jump模块的连接
         .o_jump_en(jump_en),
@@ -170,10 +170,11 @@ module top(
     );
 
     Buzzer buzzer_inst(
-        .clk(clk),
-        .rst_n(1'b1),
-        .music_scale(squeeze_man/2),
-        .beep(o_buzzer)
+        .clk(div_res[1]),
+        .rst_n(~rst),
+        .music_scale(o_squeeze_man/2),
+        .beep(o_buzzer),
+        .i_load_done(jump_done)
     );
 
 
