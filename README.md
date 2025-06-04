@@ -32,6 +32,10 @@
 
 另一方面，这次我修改了Buzzer模块的代码，使其发出声音的频率能根据squeeze_man的大小变化快速发生改变，换句话就是降低了它们之间的延迟。然而，具体的效果还需要等到下板的时候看看。
 
+还有就是，新的vivado工程重构文件已经生成。当然，你不需要使用它重构vivado工程。因为你可以直接把toplevel_source/ip/img_fameover_mark导入到你的项目中。
+
+注意：vivado在toplevel_source/ip/img_fameover_mark这个文件夹下面好像存放了一些综合结果，这导致这个文件夹比较大，我暂时也不知道怎么解决这个问题。
+
 #### <i class="fas fa-calendar-alt" style="color: darkblue;"></i> 2025.06.02
 
 下板结果正常，但是存在一下几个问题：
