@@ -4,7 +4,7 @@
     "xci_name": "img_gameover_mark",
     "component_reference": "xilinx.com:ip:blk_mem_gen:8.4",
     "ip_revision": "5",
-    "gen_directory": ".",
+    "gen_directory": "../../../../jump_game.gen/sources_1/ip/img_gameover_mark",
     "parameters": {
       "component_parameters": {
         "Component_Name": [ { "value": "img_gameover_mark", "resolve_type": "user", "usage": "all" } ],
@@ -176,7 +176,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "5" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "." } ],
+        "OUTPUTDIR": [ { "value": "../../../../jump_game.gen/sources_1/ip/img_gameover_mark" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2022.2" } ],

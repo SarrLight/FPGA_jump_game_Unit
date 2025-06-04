@@ -5,6 +5,8 @@
 ## 前言
 如果你需要使用这个项目仓库的话，请先在你的vscode下载git graph插件，你可以在网上查看教程，学会如何把这个项目下载到本地，以及如何使用git graph这个插件。
 
+#### 如何利用tcl文件生成vivado工程
+
 你可以参考https://zhuanlan.zhihu.com/p/6522301675 这篇文章，学会使用vivado的tcl命令来构建vivado工程和生成项目重构文件。
 
 例如 想要利用tcl文件生成vivado工程，你需要先cd到vivado_prj文件夹内，你需要修改成你的本地路径。
@@ -21,6 +23,13 @@
 
 执行之后就可以在vivado_prj生成vivado工程了。
 
+#### 如何创建新的vivado工程重构文件
+
+在tcl控制台运行下述指令，就可以生成新的vivado工程重构文件。
+write_project_tcl -force 后面填写toplevel_project_gen.tcl文件路径
+
+指令中-force是强制覆盖已有的文件，如果没有这个参数，则会报错。
+
 ## 现阶段进度
 
 #### <i class="fas fa-calendar-alt" style="color: darkblue;"></i> 2025.06.04
@@ -34,7 +43,9 @@
 
 还有就是，新的vivado工程重构文件已经生成。当然，你不需要使用它重构vivado工程。因为你可以直接把toplevel_source/ip/img_fameover_mark导入到你的项目中。
 
-注意：vivado在toplevel_source/ip/img_fameover_mark这个文件夹下面好像存放了一些综合结果，这导致这个文件夹比较大，我暂时也不知道怎么解决这个问题。
+~~注意：vivado在toplevel_source/ip/img_gameover_mark这个文件夹下面好像存放了一些综合结果，这导致这个文件夹比较大，我暂时也不知道怎么解决这个问题。~~
+
+删除线对应的问题已解决，解决方式是我现在本地的另一个vivado工程创建ip，然后把生成的ip放到/toplevel_source/ip/img_gameover_mark这里。之后导入到本项目的vivado工程中。这样新生成的缓存文件就会放在工程自己的文件夹中，这些缓存文件就不会被git记录。
 
 #### <i class="fas fa-calendar-alt" style="color: darkblue;"></i> 2025.06.02
 
