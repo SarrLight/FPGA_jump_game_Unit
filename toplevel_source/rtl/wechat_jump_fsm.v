@@ -67,7 +67,7 @@ module wechat_jump_fsm (
     localparam ORIGIN         = 32'd0;   // 基准原点坐标
     localparam ORIGIN_STARTUP = 32'd100;     // INIT状态时，箱子1的初始坐标，待修改
     localparam BLOCK_WIDTH    = 32'd30;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
-    localparam BLOCK2_OFFSET  = 32'd240;    // 箱子2基础偏移量
+    localparam BLOCK2_OFFSET  = 32'd180;    // 箱子2基础偏移量
     localparam MAX_SQUEEZE    = 4'd14;     // 最大压扁计数器值，挤压范围是0-14
 
     // ================= 内部信号 ================= //
