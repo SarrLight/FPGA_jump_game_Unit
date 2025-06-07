@@ -78,6 +78,7 @@ module wechat_jump_fsm_tb( );
     wire [3:0] o_squeeze_man;
     wire o_title;
     wire o_gameover;
+    wire o_buzzer;
 
     wire [31:0] div_res;
 
@@ -137,6 +138,14 @@ module wechat_jump_fsm_tb( );
         .o_height(i_jump_height),
         .o_dist(i_jump_dist),
         .o_done(i_jump_done)
+    );
+
+    Buzzer buzzer_inst(
+        .clk(clk_machine),
+        .rst_n(~rst_machine),
+        .music_scale(o_squeeze_man/2),
+        .beep(o_buzzer),
+        .i_load_done(i_jump_done)
     );
 
     // –≈∫≈≥ı ºªØ
