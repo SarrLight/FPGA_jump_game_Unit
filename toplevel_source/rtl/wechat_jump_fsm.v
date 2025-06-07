@@ -271,17 +271,17 @@ module wechat_jump_fsm (
         end else begin
             case (state)
                 INIT: begin
-                    o_x_man <= o_x_block2;
+                    o_x_man <= o_x_man;
                     o_y_man <= 0;
                 end
                 
                 ACCU: begin
-                    o_x_man <= o_x_block1;
+                    o_x_man <= o_x_man-(o_x_block2-o_x_block1);
                     o_y_man <= 0;
                 end
                 
                 JUMP: begin
-                    o_x_man <= i_jump_dist*400/260; //将最远距离调整为400     
+                    o_x_man <= o_x_man+(i_jump_dist*400/260); //将最远距离调整为400     
                     o_y_man <= i_jump_height;       
                 end
                 
