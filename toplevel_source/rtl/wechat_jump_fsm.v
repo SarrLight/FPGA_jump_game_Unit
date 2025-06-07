@@ -139,8 +139,8 @@ module wechat_jump_fsm (
                     if (o_x_man <= BLOCK_WIDTH) begin // 小人未跳出箱子时
                         state <= WAIT;      // 重新进行按键跳跃
                     end else if((o_x_man < o_x_block2)?
-                        (o_x_block2-o_x_man <= BLOCK_WIDTH)
-                        :(o_x_man-o_x_block2 <= BLOCK_WIDTH)) begin
+                        (o_x_block2-o_x_man <BLOCK_WIDTH)
+                        :(o_x_man-o_x_block2 <BLOCK_WIDTH)) begin
                         state <= INIT;      // 箱子位置交换
                     end else begin
                         state <= OVER;      // 游戏结束状态
@@ -281,7 +281,7 @@ module wechat_jump_fsm (
                 end
                 
                 JUMP: begin
-                    o_x_man <= o_x_man+(i_jump_dist*400/260); //将最远距离调整为400     
+                    o_x_man <= i_jump_dist*400/260; //将最远距离调整为400     
                     o_y_man <= i_jump_height;       
                 end
                 
