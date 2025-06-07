@@ -66,7 +66,7 @@ module wechat_jump_fsm (
     //坐标单位是像素
     localparam ORIGIN         = 32'd0;   // 基准原点坐标
     localparam ORIGIN_STARTUP = 32'd100;     // INIT状态时，箱子1的初始坐标，待修改
-    localparam BLOCK_WIDTH    = 32'd30;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
+    localparam BLOCK_WIDTH    = 32'd40;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
     localparam BLOCK2_OFFSET  = 32'd180;    // 箱子2基础偏移量
     localparam MAX_SQUEEZE    = 4'd14;     // 最大压扁计数器值，挤压范围是0-14
 
@@ -77,6 +77,8 @@ module wechat_jump_fsm (
     reg         reload_done;          // 复位完成标志
     wire [6:0]  random;               // 用于接受random模块产生的随机数
     reg new_game;                     // 用于判断是否为新游戏，若为新游戏，则显示标题画面
+    reg  x_on_block2;        // 判断是否在箱子2的有效范围内
+    reg  [10:0] dis_block2_and_man;         // 小人和箱子2的距离
 
 
     // 输出赋值
@@ -136,11 +138,9 @@ module wechat_jump_fsm (
                     end
                 end
                 LAND: begin             // 着陆判定状态
-                wire x_on_block1 = (o_x_man >= o_x_block1 - BLOCK_WIDTH) && (o_x_man <= o_x_block1 + BLOCK_WIDTH);
-                wire x_on_block2 = (o_x_block2 != o_x_block1) && (o_x_man >= o_x_block2 - BLOCK_WIDTH) && (o_x_man <= o_x_block2 + BLOCK_WIDTH);
-                if (o_x_man < o_x_block1 - BLOCK_WIDTH) begin // 完全未跳出第一个箱子
-                    state <= WAIT;
-                end else if (x_on_block1 || x_on_block2) begin // 落在任意箱子的有效范围内（包含边缘）
+                x_on_block2 = (o_x_man >= o_x_block2 - BLOCK_WIDTH) && (o_x_man <= o_x_block2 + BLOCK_WIDTH);
+                dis_block2_and_man = o_x_man - o_x_block2;
+                if (x_on_block2) begin // 落在任意箱子的有效范围内（包含边缘）
                     state <= INIT; 
                 end
                 else begin  // 坠落
@@ -247,7 +247,7 @@ module wechat_jump_fsm (
         end else begin
             case(state)
                 ACCU: begin
-                    if (i_btn && cnt_v_init < 24'hffffff && cnt_v_init %2 == 0) begin //利用cnt_v_init来记录按键持续的clk周期数
+                    if (i_btn && cnt_v_init < 24'hffffff) begin //利用cnt_v_init来记录按键持续的clk周期数
                         cnt_v_init <= cnt_v_init + 1;
                     end else begin
                         cnt_v_init <= cnt_v_init;
@@ -272,12 +272,12 @@ module wechat_jump_fsm (
         end else begin
             case (state)
                 INIT: begin
-                    o_x_man <= o_x_man;
+                    o_x_man <= o_x_block2 + dis_block2_and_man;
                     o_y_man <= 0;
                 end
                 
                 ACCU: begin
-                    o_x_man <= o_x_man-(o_x_block2-o_x_block1);
+                    o_x_man <= o_x_man;
                     o_y_man <= 0;
                 end
                 
@@ -287,11 +287,12 @@ module wechat_jump_fsm (
                 end
                 
                 LAND, OVER: begin
-                    // 保持当前位置
+                    o_x_man <= o_x_man;
+                    o_y_man <= 0;
                 end
                 
                 default: begin
-                    o_x_man <= o_x_block1;
+                    o_x_man <= o_x_block1 + dis_block2_and_man;
                     o_y_man <= 0;
                 end
             endcase
