@@ -136,15 +136,16 @@ module wechat_jump_fsm (
                     end
                 end
                 LAND: begin             // 着陆判定状态
-                    if (o_x_man <= BLOCK_WIDTH) begin // 小人未跳出箱子时
-                        state <= WAIT;      // 重新进行按键跳跃
-                    end else if((o_x_man < o_x_block2)?
-                        (o_x_block2-o_x_man <BLOCK_WIDTH)
-                        :(o_x_man-o_x_block2 <BLOCK_WIDTH)) begin
-                        state <= INIT;      // 箱子位置交换
-                    end else begin
-                        state <= OVER;      // 游戏结束状态
-                    end
+                wire x_on_block1 = (o_x_man >= o_x_block1 - BLOCK_WIDTH) && (o_x_man <= o_x_block1 + BLOCK_WIDTH);
+                wire x_on_block2 = (o_x_block2 != o_x_block1) && (o_x_man >= o_x_block2 - BLOCK_WIDTH) && (o_x_man <= o_x_block2 + BLOCK_WIDTH);
+                if (o_x_man < o_x_block1 - BLOCK_WIDTH) begin // 完全未跳出第一个箱子
+                    state <= WAIT;
+                end else if (x_on_block1 || x_on_block2) begin // 落在任意箱子的有效范围内（包含边缘）
+                    state <= INIT; 
+                end
+                else begin  // 坠落
+                    state <= OVER;
+                     end
                 end
                 OVER: begin             // 游戏结束状态
                     state <= OVER;          // 保持当前状态
@@ -246,7 +247,7 @@ module wechat_jump_fsm (
         end else begin
             case(state)
                 ACCU: begin
-                    if (i_btn && cnt_v_init < 24'hffffff) begin //利用cnt_v_init来记录按键持续的clk周期数
+                    if (i_btn && cnt_v_init < 24'hffffff && cnt_v_init %2 == 0) begin //利用cnt_v_init来记录按键持续的clk周期数
                         cnt_v_init <= cnt_v_init + 1;
                     end else begin
                         cnt_v_init <= cnt_v_init;
