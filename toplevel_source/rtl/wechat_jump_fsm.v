@@ -49,7 +49,9 @@ module wechat_jump_fsm (
 
     //增添解释：输出给graphics模块，表示是否显示标题和游戏结束画面
     output reg o_title,
-    output reg o_gameover
+    output reg o_gameover,
+
+    output reg  [9:0] o_score         // 得分
     
     );
 
@@ -72,16 +74,18 @@ module wechat_jump_fsm (
 
     // ================= 内部信号 ================= //
     reg  [16:0] cnt_clk_reload;       // 复位动画计数器
-    reg  [23:0] cnt_v_init;           // 初速度计数器，利用cnt_v_init来记录按键持续的clk周期数
+    reg  [31:0] cnt_v_init;           // 初速度计数器，利用cnt_v_init来记录按键持续的clk周期数
     /*解释：因为小人跳跃初速度和小人的挤压程度有定比关系，所以原本的“压扁时钟时钟和计数器”没有存在的必要*/
     reg         reload_done;          // 复位完成标志
     wire [6:0]  random;               // 用于接受random模块产生的随机数
     reg new_game;                     // 用于判断是否为新游戏，若为新游戏，则显示标题画面
 
+    reg  [10:0] relative_x;           // 相对坐标，用于计算小人的坐标
+
 
     // 输出赋值
-    assign o_jump_v_init = cnt_v_init[23:17];  // 取cnt_v_init的最高7位作为初速度，范围是0-127，jump模块中初速度为127时，跳跃高度为256，距离为260
-    assign o_squeeze_man = state==JUMP? 0 : cnt_v_init[23:17]*14/127%15;   // 取cnt_v_init的最高4位作为压扁度，范围是0-14，对应共计15帧的小人压扁图片
+    assign o_jump_v_init = cnt_v_init[24:18];  // 取cnt_v_init的最高7位作为初速度，范围是0-127，jump模块中初速度为127时，跳跃高度为256，距离为260
+    assign o_squeeze_man = state==JUMP? 0 : cnt_v_init[24:18]*14/127%15;   // 取cnt_v_init的最高4位作为压扁度，范围是0-14，对应共计15帧的小人压扁图片
 
 
 
@@ -94,6 +98,7 @@ module wechat_jump_fsm (
             o_title        <= 1'b1; 
             o_gameover     <= 1'b0;
             o_jump_en      <= 1'b0;
+            o_score        <= 10'd0;
         end else begin                 // 复位信号消失时
             case (state)
                 INIT: begin              
@@ -141,6 +146,8 @@ module wechat_jump_fsm (
                     end else if((o_x_man < o_x_block2)?
                         (o_x_block2-o_x_man <BLOCK_WIDTH)
                         :(o_x_man-o_x_block2 <BLOCK_WIDTH)) begin
+                        o_score <= o_score + 1; // 得分加1
+                        relative_x <= o_x_man - o_x_block2; // 计算相对坐标，用于计算小人的坐标,保持小人与它脚下的箱子相对位置不变
                         state <= INIT;      // 箱子位置交换
                     end else begin
                         state <= OVER;      // 游戏结束状态
@@ -175,6 +182,7 @@ module wechat_jump_fsm (
             o_en_block2 <= 1'b0;              // 隐藏箱子2
             reload_done <= 1'b0;             
             cnt_clk_reload <= 17'd0;          // 复位动画计数器
+            relative_x <= 0;                 // 相对坐标初始化
         end else begin
             case (state)
                 INIT: begin
@@ -246,7 +254,7 @@ module wechat_jump_fsm (
         end else begin
             case(state)
                 ACCU: begin
-                    if (i_btn && cnt_v_init < 24'hffffff) begin //利用cnt_v_init来记录按键持续的clk周期数
+                    if (i_btn && cnt_v_init < 25'h1ffffff) begin //利用cnt_v_init来记录按键持续的clk周期数
                         cnt_v_init <= cnt_v_init + 1;
                     end else begin
                         cnt_v_init <= cnt_v_init;
@@ -274,9 +282,14 @@ module wechat_jump_fsm (
                     o_x_man <= o_x_man;
                     o_y_man <= 0;
                 end
+
+                RELD: begin
+                    o_x_man <= o_x_block1 + relative_x;
+                    o_y_man <= 0;
+                end
                 
                 ACCU: begin
-                    o_x_man <= o_x_man-(o_x_block2-o_x_block1);
+                    o_x_man <= o_x_man;
                     o_y_man <= 0;
                 end
                 
@@ -289,10 +302,7 @@ module wechat_jump_fsm (
                     // 保持当前位置
                 end
                 
-                default: begin
-                    o_x_man <= o_x_block1;
-                    o_y_man <= 0;
-                end
+
             endcase
         end
     end

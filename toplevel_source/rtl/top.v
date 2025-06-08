@@ -35,7 +35,11 @@ module top(
     output wire [3:0] o_b,
 
     //buzzer接口
-    output o_buzzer
+    output o_buzzer,
+
+    //四位七段数码表输出接口
+    output wire [7:0] o_segment,
+    output wire [3:0] o_segment_an
 
     );
 
@@ -80,6 +84,8 @@ module top(
     //小人跳跃的初始速度，有效范围暂不确定
     wire [10:0] jump_v_init; 
 
+    wire [9:0] score;   //当前得分,最高为1023分
+
     //32位的计数器，作为分频器
     clkdiv clkdiv_inst(
         .clk(clk),
@@ -90,7 +96,7 @@ module top(
 
     jump jump_inst(
         .en(jump_en),
-        .clk_jump(div_res[18]),      //此处分频次数需根据实际情况调大
+        .clk_jump(div_res[19]),      //此处分频次数需根据实际情况调大
         .i_v_init(jump_v_init),
         .o_height(jump_height),
         .o_dist(jump_dist),
@@ -120,7 +126,9 @@ module top(
         .o_jump_v_init(jump_v_init),
         .i_jump_dist(jump_dist),
         .i_jump_height(jump_height),
-        .i_jump_done(jump_done)
+        .i_jump_done(jump_done),
+
+        .o_score(score)
 
     );
 
@@ -172,9 +180,17 @@ module top(
     Buzzer buzzer_inst(
         .clk(div_res[1]),
         .rst_n(~rst),
-        .music_scale(o_squeeze_man/2),
+        .music_scale({2'd0,o_squeeze_man}),
         .beep(o_buzzer),
         .i_load_done(jump_done)
+    );
+
+    display_socre display_socre_inst(
+        .clk(clk_machine),
+        .rst(rst_machine),
+        .i_score(score),
+        .o_segment(o_segment),
+        .o_segment_an(o_segment_an)
     );
 
 
