@@ -82,6 +82,18 @@ module wechat_jump_fsm_tb( );
 
     wire [31:0] div_res;
 
+    wire [9:0] o_score;
+
+    wire [15:0] o_segment;
+    wire [3:0] o_segment_an;
+
+    wire [10:0] screen_x_man;
+    wire [10:0] screen_y_man;
+
+
+    assign screen_x_man = 11'd237+o_x_man;
+    assign screen_y_man = (o_x_man[9]==1'b1) ? (11'd337-o_y_man+(~o_x_man +11'd1)*11'd4/11'd7) : (11'd337-o_y_man-o_x_man*11'd4/11'd7);
+
     /*
     module clkdiv(clk,rst,div_res);
     input   clk;
@@ -117,8 +129,9 @@ module wechat_jump_fsm_tb( );
         .o_type_block2(o_type_block2),
         .o_squeeze_man(o_squeeze_man),
         .o_title(o_title),
-        .o_gameover(o_gameover)
+        .o_gameover(o_gameover),
 
+        .o_score(o_score)
     );
     /*
     module jump(
@@ -133,7 +146,7 @@ module wechat_jump_fsm_tb( );
 
     jump jump_inst(
         .en(o_jump_en),
-        .clk_jump(div_res[17]),
+        .clk_jump(div_res[19]),
         .i_v_init(o_jump_v_init),
         .o_height(i_jump_height),
         .o_dist(i_jump_dist),
@@ -143,10 +156,28 @@ module wechat_jump_fsm_tb( );
     Buzzer buzzer_inst(
         .clk(clk_machine),
         .rst_n(~rst_machine),
-        .music_scale(o_squeeze_man/2),
+        .music_scale({2'd0,o_squeeze_man}),
         .beep(o_buzzer),
         .i_load_done(i_jump_done)
     );
+
+    /*
+    module display_socre(
+        input  clk,
+        input  rst,
+        input  [9:0] i_score,
+        output [7:0] o_segment, // 7段数码管输出，需要最终输出给硬件接口
+        output [3:0] o_segment_an   // 4个七段数码管的选通控制信号，需要最终输出给硬件接口
+    );
+    */
+    display_socre display_socre_inst(
+        .clk(clk_machine),
+        .rst(rst_machine),
+        .i_score(o_score),
+        .o_segment(o_segment),
+        .o_segment_an(o_segment_an)
+    );
+
 
     // 信号初始化
     initial begin
