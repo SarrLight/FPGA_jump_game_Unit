@@ -51,7 +51,9 @@ module wechat_jump_fsm (
     output reg o_title,
     output reg o_gameover,
 
-    output reg  [9:0] o_score         // 得分
+    output reg  [9:0] o_score,         // 得分
+
+    output reg o_perfect
     
     );
 
@@ -68,7 +70,8 @@ module wechat_jump_fsm (
     //坐标单位是像素
     localparam ORIGIN         = 32'd0;   // 基准原点坐标
     localparam ORIGIN_STARTUP = 32'd100;     // INIT状态时，箱子1的初始坐标，待修改
-    localparam BLOCK_WIDTH    = 32'd30;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
+    localparam BLOCK_WIDTH    = 32'd35;   // 其实是箱子宽度的一半，小人与箱子坐标差值小于此数说明小人在箱子上
+    localparam BLOCK_CENTER_WIDTH = 32'd10; // 箱子中心宽度
     localparam BLOCK2_OFFSET  = 32'd180;    // 箱子2基础偏移量
     localparam MAX_SQUEEZE    = 4'd14;     // 最大压扁计数器值，挤压范围是0-14
 
@@ -99,6 +102,9 @@ module wechat_jump_fsm (
             o_gameover     <= 1'b0;
             o_jump_en      <= 1'b0;
             o_score        <= 10'd0;
+            
+            relative_x <= 11'd0;                 // 相对坐标初始化
+            o_perfect     <= 1'b0;
         end else begin                 // 复位信号消失时
             case (state)
                 INIT: begin              
@@ -115,13 +121,12 @@ module wechat_jump_fsm (
                     end
                 end
                 WAIT: begin             // 等待按键状态
-                    if(new_game) begin
-                        new_game <= 1'b0;   //复位动画结束，说明不是新游戏
-                        o_title <= 1'b0;   // 隐藏标题画面
-                    end
-                    
                     if (i_btn) begin       // 玩家按下按键时，进入蓄力状态
-                        state <= ACCU;  
+                        state <= ACCU; 
+                        if(new_game) begin
+                            new_game <= 1'b0;   //复位动画结束，说明不是新游戏
+                            o_title <= 1'b0;   // 隐藏标题画面
+                        end
                     end
                 end
                 ACCU: begin             // 蓄力状态
@@ -144,9 +149,17 @@ module wechat_jump_fsm (
                     if (o_x_man <= BLOCK_WIDTH) begin // 小人未跳出箱子时
                         state <= WAIT;      // 重新进行按键跳跃
                     end else if((o_x_man < o_x_block2)?
+                        (o_x_block2-o_x_man <BLOCK_CENTER_WIDTH)
+                        :(o_x_man-o_x_block2 <BLOCK_CENTER_WIDTH)) begin
+                        o_score <= o_score + 2; // 得分加2
+                        o_perfect <= 1'b1;
+                        relative_x <= 0;
+                        state <= INIT;      // 箱子位置交换
+                    end else if((o_x_man < o_x_block2)?
                         (o_x_block2-o_x_man <BLOCK_WIDTH)
                         :(o_x_man-o_x_block2 <BLOCK_WIDTH)) begin
                         o_score <= o_score + 1; // 得分加1
+                        o_perfect <= 1'b0;
                         relative_x <= o_x_man - o_x_block2; // 计算相对坐标，用于计算小人的坐标,保持小人与它脚下的箱子相对位置不变
                         state <= INIT;      // 箱子位置交换
                     end else begin
@@ -182,7 +195,6 @@ module wechat_jump_fsm (
             o_en_block2 <= 1'b0;              // 隐藏箱子2
             reload_done <= 1'b0;             
             cnt_clk_reload <= 17'd0;          // 复位动画计数器
-            relative_x <= 0;                 // 相对坐标初始化
         end else begin
             case (state)
                 INIT: begin
@@ -294,7 +306,7 @@ module wechat_jump_fsm (
                 end
                 
                 JUMP: begin
-                    o_x_man <= i_jump_dist*400/260; //将最远距离调整为400     
+                    o_x_man <= o_x_block1 + relative_x + i_jump_dist*400/260; //将最远距离调整为400     
                     o_y_man <= i_jump_height;       
                 end
                 

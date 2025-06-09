@@ -25,7 +25,9 @@ module Buzzer(
     input rst_n,        //同步复位信号(低电平有效)
     input [5:0] music_scale,
     output reg beep,
-    input i_load_done   //小人正确落到箱子上的标志
+    input i_load_done,   //小人正确落到箱子上的标志
+    input i_perfect,
+    input i_gameover
 );
     
 
@@ -112,6 +114,8 @@ module Buzzer(
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             cnt_hz <= REST;
+        end else if(playing_load_audio) begin
+            cnt_hz <= i_perfect && ~i_gameover ? F_MID : F_LOW;
         end else begin
             
             case(music_scale)
@@ -140,9 +144,7 @@ module Buzzer(
                 default: cnt_hz <= REST;
             endcase
 
-            if(playing_load_audio) begin
-                cnt_hz <= C_LOW;
-            end
+            
         end
     end
 

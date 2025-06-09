@@ -57,7 +57,7 @@ module graphic_vga_tb();
        .i_en_block1(1'b1),
        .i_x_block2(0),
        .i_en_block2(0),
-       .i_x_man(400),
+       .i_x_man(11'd0-11'd1),
        //.i_x_man(300),
        .i_y_man(0),
        .i_squeeze_man(0),

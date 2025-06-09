@@ -84,9 +84,9 @@ module graphics(
         && addr_y_img_block2>=15'd0 && addr_y_img_block2<15'd180;
     assign en_man = addr_x_img_jump>=17'd0 && addr_x_img_jump<17'd50 
         && addr_y_img_jump>17'd0 && addr_y_img_jump<17'd100;
-    assign en_title = i_title && addr_x_img_title>=0 && addr_x_img_title<493 
+    assign en_title = i_title && addr_x_img_title>0 && addr_x_img_title<493 
         && addr_y_img_title>0 && addr_y_img_title<144;
-    assign en_gameover = i_gameover && addr_x_img_gameover>=0 && addr_x_img_gameover<433 
+    assign en_gameover = i_gameover && addr_x_img_gameover>0 && addr_x_img_gameover<433 
         && addr_y_img_gameover>0 && addr_y_img_gameover<109;
 
     //将读到的坐标转换到ani_jump_0_14的地址
@@ -127,7 +127,7 @@ module graphics(
 
     //将man，block1，block2的坐标转换到屏幕坐标
     assign screen_x_man = 11'd237+i_x_man;
-    assign screen_y_man = 11'd337-i_y_man-i_x_man*4/7;
+    assign screen_y_man = (i_x_man[9]==1'b1) ? (11'd337-i_y_man+(~i_x_man +11'd1)*11'd4/11'd7) : (11'd337-i_y_man-i_x_man*11'd4/11'd7);
 
     assign screen_x_block1 = 11'd237+i_x_block1;
     assign screen_y_block1 = 11'd337-i_x_block1*4/7;
@@ -182,13 +182,13 @@ module graphics(
     img_gameover img_gameover_inst(
         .clka(clk),
         //.ena(en_gameover),
-        .addra(addr_img_gameover),
+        .addra(addr_img_gameover[15:0]),
         .douta(dout_img_gameover)
     );
 
     img_gameover_mark img_gameover_mark_inst(
         .clka(clk),
-        .addra(addr_img_gameover),
+        .addra(addr_img_gameover[15:0]),
         .douta(dout_img_gameover_mark)
     );
 

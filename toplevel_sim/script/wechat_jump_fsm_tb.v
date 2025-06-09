@@ -87,6 +87,13 @@ module wechat_jump_fsm_tb( );
     wire [15:0] o_segment;
     wire [3:0] o_segment_an;
 
+    wire [10:0] screen_x_man;
+    wire [10:0] screen_y_man;
+
+
+    assign screen_x_man = 11'd237+o_x_man;
+    assign screen_y_man = (o_x_man[9]==1'b1) ? (11'd337-o_y_man+(~o_x_man +11'd1)*11'd4/11'd7) : (11'd337-o_y_man-o_x_man*11'd4/11'd7);
+
     /*
     module clkdiv(clk,rst,div_res);
     input   clk;

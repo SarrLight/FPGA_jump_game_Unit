@@ -86,6 +86,8 @@ module top(
 
     wire [9:0] score;   //当前得分,最高为1023分
 
+    wire perfect;
+
     //32位的计数器，作为分频器
     clkdiv clkdiv_inst(
         .clk(clk),
@@ -128,7 +130,8 @@ module top(
         .i_jump_height(jump_height),
         .i_jump_done(jump_done),
 
-        .o_score(score)
+        .o_score(score),
+        .o_perfect(perfect)
 
     );
 
@@ -180,14 +183,16 @@ module top(
     Buzzer buzzer_inst(
         .clk(div_res[1]),
         .rst_n(~rst),
-        .music_scale({2'd0,o_squeeze_man}),
+        .music_scale({2'd0,squeeze_man}),
         .beep(o_buzzer),
-        .i_load_done(jump_done)
+        .i_load_done(jump_done),
+        .i_perfect(perfect),
+        .i_gameover(gameover)
     );
 
     display_socre display_socre_inst(
-        .clk(clk_machine),
-        .rst(rst_machine),
+        .clk(clk),
+        .rst(rst),
         .i_score(score),
         .o_segment(o_segment),
         .o_segment_an(o_segment_an)
