@@ -23,6 +23,7 @@ module wechat_jump_fsm (
     input  wire        clk_machine,    // 主时钟 (25.175MHz)
     input  wire        rst_machine,    // 异步复位 (高有效)
     input  wire        i_btn,          // 玩家按键输入
+    input  wire        i_btn_origin,
 
     //与jump模块的连接
     input  wire        i_jump_done,    // 物理引擎跳跃完成信号
@@ -183,7 +184,7 @@ module wechat_jump_fsm (
     random #(7) random_inst (
         .clk_random(clk_machine),
         .rst_random(rst_machine),
-        .i_roll(i_btn),
+        .i_roll(i_btn_origin),
         .o_random_binary(random)
     );
 

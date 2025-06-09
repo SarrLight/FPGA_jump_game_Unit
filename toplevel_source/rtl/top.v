@@ -26,6 +26,7 @@ module top(
 
     //用户输入的按钮，前期可以用开关代替，做好防抖之后再换成按钮
     input i_bt,
+    output BTN_X,
 
     //vga接口
     output wire o_vs,
@@ -42,6 +43,10 @@ module top(
     output wire [3:0] o_segment_an
 
     );
+
+    assign BTN_X = 1'b0;
+
+    wire bt_n;
 
 
     //分频器的分频结果
@@ -95,6 +100,13 @@ module top(
         .div_res(div_res)
     );
 
+    //按钮防抖模块
+    Anti_jitter Anti_jitter_inst(
+        .clk(div_res[19]),
+        .BTN(i_bt),
+        .BTN_OK(bt_n)
+    );
+
 
     jump jump_inst(
         .en(jump_en),
@@ -109,7 +121,8 @@ module top(
         //接收来自top的信号
         .clk_machine(div_res[1]),
         .rst_machine(rst),  //异步复位，高有效
-        .i_btn(i_bt),
+        .i_btn(~bt_n),
+        .i_btn_origin(~i_bt),
 
         //输出传递给graphics模块的信号
         .o_x_man(x_man),

@@ -20,10 +20,16 @@ set_property IOSTANDARD LVCMOS18 [get_ports clk]
 # Switches as inputs
 #      SW[9]  SW[8]  SW[7]      SW[6]   SW[5]        SW[4]        SW[3]        SW[2]        SW[1]       SW[0]
 #      AE12   AE10   AD10       AD11    Y12          Y13          AA12          AA13         AB10        AA10
-set_property PACKAGE_PIN AD10 [get_ports i_bt]
-set_property PACKAGE_PIN AE12 [get_ports rst]
 
-set_property IOSTANDARD LVCMOS15 [get_ports i_bt]
+# set_property PACKAGE_PIN AD10 [get_ports i_bt]
+# set_property IOSTANDARD LVCMOS15 [get_ports i_bt]
+
+set_property PACKAGE_PIN W16 [get_ports BTN_X]
+set_property IOSTANDARD LVCMOS18 [get_ports BTN_X]
+set_property PACKAGE_PIN W14 [get_ports i_bt]
+set_property IOSTANDARD LVCMOS18 [get_ports i_bt]
+
+set_property PACKAGE_PIN AE12 [get_ports rst]
 set_property IOSTANDARD LVCMOS15 [get_ports rst]
 
 set_property PACKAGE_PIN AF25 [get_ports o_buzzer]
