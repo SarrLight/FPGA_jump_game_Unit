@@ -29,7 +29,7 @@ set_property IOSTANDARD LVCMOS18 [get_ports BTN_X]
 set_property PACKAGE_PIN W14 [get_ports i_bt]
 set_property IOSTANDARD LVCMOS18 [get_ports i_bt]
 
-set_property PACKAGE_PIN AE12 [get_ports rst]
+set_property PACKAGE_PIN AA10 [get_ports rst]
 set_property IOSTANDARD LVCMOS15 [get_ports rst]
 
 set_property PACKAGE_PIN AF25 [get_ports o_buzzer]
