@@ -43,6 +43,10 @@ write_project_tcl -force 后面填写toplevel_project_gen.tcl文件路径
 
 当然，一般情况下，如果想之间在远程的origin/main分支基础上进行工作的话，可以直接reset curent branch到origin/main，然后再checkout到新的分支进行工作。不过这样可能会导致你丢失一些本地的修改，因此这样做的前提是，你当前并没有做什么修改。参考链接：[知乎：VSCode_Git_操作（rebase+revert+reset）](https://zhuanlan.zhihu.com/p/69286730)
 
+在下图的位置你可以设置git graph查看文件的编码方式，不过README.md用的是utf-8编码，而git graph又没有那么智能。所以这个做法仅供参考。（下次我一定统一使用utf-8，要不然太麻烦了```〒▽〒```）
+
+![alt text](./pictures/git_graph_encoding.png)
+
 #### <i class="fas fa-calendar-alt" style="color: darkblue;"></i> 2025.06.08
 
 注意：我在vivado工程添加了新的文件，你需要把他们手动添加到你的工程中。新的重构文件已经生成，你也可以使用它来重构你的工程。
