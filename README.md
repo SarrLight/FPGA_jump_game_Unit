@@ -32,6 +32,17 @@ write_project_tcl -force 后面填写toplevel_project_gen.tcl文件路径
 
 ## 现阶段进度
 
+#### <i class="fas fa-calendar-alt" style="color: darkblue;"></i> 2025.06.10
+
+---
+![alt text](./pictures/git_decoding_problem.png)
+
+---
+
+上面的图片来自[Git教程；什么会导致Git对字符编码产生混乱](https://geek-docs.com/git/git-questions/202_git_what_can_cause_git_to_mess_with_character_encoding.html)，乱码问题是在进行merge时导致的。解决方法就是merge的时候小心一点，要保证文件编码方式相同，如果还不行，就只能自己手动merge了。或许还有什么办法可以修改git的编码方式，这我还不知道。我先用.gitattributes文件来尝试解决这个问题。
+
+当然，一般情况下，如果想之间在远程的origin/main分支基础上进行工作的话，可以直接reset curent branch到origin/main，然后再checkout到新的分支进行工作。不过这样可能会导致你丢失一些本地的修改，因此这样做的前提是，你当前并没有做什么修改。参考链接：[知乎：VSCode_Git_操作（rebase+revert+reset）](https://zhuanlan.zhihu.com/p/69286730)
+
 #### <i class="fas fa-calendar-alt" style="color: darkblue;"></i> 2025.06.08
 
 注意：我在vivado工程添加了新的文件，你需要把他们手动添加到你的工程中。新的重构文件已经生成，你也可以使用它来重构你的工程。

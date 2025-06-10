@@ -1,0 +1,3 @@
+*.v     text     eol=lf    charset=gb2312
+*.vh    text     eol=lf    charset=gb2312
+*.vhd   text     eol=lf    charset=gb2312
