@@ -107,7 +107,7 @@ module top(
         .BTN_OK(bt_n)
     );
 
-
+    //物理引擎，产生抛物线运动
     jump jump_inst(
         .en(jump_en),
         .clk_jump(div_res[19]),      //此处分频次数需根据实际情况调大
@@ -117,6 +117,7 @@ module top(
         .o_done(jump_done)
     );
 
+    //微信跳一跳的状态机
     wechat_jump_fsm wechat_jump_fsm_inst(  
         //接收来自top的信号
         .clk_machine(div_res[1]),
@@ -148,6 +149,7 @@ module top(
 
     );
 
+    //图形引擎
     graphics graphics_inst(
 
        .clk(div_res[1]),
@@ -173,6 +175,7 @@ module top(
        .o_b(B)
     );
 
+    //vga驱动
     vga vga_inst(
         //接收来自top模块的信号
         .clk_vga(div_res[1]),
