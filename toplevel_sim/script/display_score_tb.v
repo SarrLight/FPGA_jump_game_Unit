@@ -35,7 +35,7 @@ module display_score_tb();
     );
     */
 
-    display_socre display_socre_inst(
+    display_score display_score_inst(
         .clk(clk),
         .rst(rst),
         .i_score(i_score),

@@ -5,7 +5,7 @@
 // 
 // Create Date: 2025/06/08 11:41:08
 // Design Name: 
-// Module Name: display_socre
+// Module Name: display_score
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module display_socre(
+module display_score(
     input  clk,
     input  rst,
     input  [9:0] i_score,
@@ -45,6 +45,5 @@ module display_socre(
        .Segment(o_segment),
        .AN(o_segment_an)
     );
-
 
 endmodule

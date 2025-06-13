@@ -206,7 +206,7 @@ module top(
         .i_gameover(gameover)
     );
 
-    display_socre display_socre_inst(
+    display_score display_score_inst(
         .clk(clk),
         .rst(rst),
         .i_score(score),

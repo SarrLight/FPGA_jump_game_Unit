@@ -82,9 +82,5 @@ module vga(
     //输出的垂直同步信号和水平同步信号
     assign o_vga_hs = hcnt >= H_SYNC_PW;
     assign o_vga_vs = vcnt >= V_SYNC_PW;
-
-    
-
- 
     
 endmodule

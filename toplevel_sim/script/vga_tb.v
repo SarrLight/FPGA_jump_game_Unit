@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2025/06/02 16:30:17
+// Create Date: 2025/06/13 11:35:58
 // Design Name: 
-// Module Name: graphic_vga_tb
+// Module Name: vga_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,66 +20,32 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module graphic_vga_tb();
+module vga_tb();
 
     reg clk;
     reg rst;
-
-    //vga接口
+    reg [3:0] R;
+    reg [3:0] G;
+    reg [3:0] B;
     wire o_vs;
     wire o_hs;
     wire [3:0] o_r;
     wire [3:0] o_g;
     wire [3:0] o_b;
-
-    //graphics模块的输出的当前读取像素的颜色，输入给vga模块
-    wire [3:0] R;
-    wire [3:0] G;
-    wire [3:0] B;
-
-    //当前读取的x，y坐标，由vga模块输出，输入给graphics模块
     wire [10:0] x_read;
     wire [10:0] y_read;
 
-
-    graphics graphics_inst(
-
-       .clk(clk),
-
-       //接收来自wechat_jump_fsm的信号
-       .i_x_block1(0),
-       .i_en_block1(1'b1),
-       .i_x_block2(0),
-       .i_en_block2(0),
-       .i_x_man(0),
-       .i_y_man(0),
-       .i_squeeze_man(0),
-       .i_type_block1(0),
-       .i_type_block2(0),
-       .i_title(1),
-       .i_gameover(0),
-
-       //和vga模块的连接
-       .i_x_read(x_read),
-       .i_y_read(y_read),
-       .o_r(R),
-       .o_g(G),
-       .o_b(B)
-    );
-
     vga vga_inst(
-        //接收来自top模块的信号
         .clk_vga(clk),
-        .rst_vga(rst),  //同步复位，高有效
+        .rst_vga(rst),  //鍚屾澶嶄綅锛岄珮鏈夋晥
         
-        //与graphics模块的连接
+        
         .i_r(R),
         .i_g(G),
         .i_b(B),
         .o_x(x_read),
         .o_y(y_read),
 
-        //给top的vga接口信号
         .o_vga_vs(o_vs),
         .o_vga_hs(o_hs),
         .o_vga_r(o_r),
@@ -91,10 +57,13 @@ module graphic_vga_tb();
         clk = 0;
         forever #5 clk = ~clk;
     end
-
     initial begin
         rst = 1;
+        R = 4'b1111;
+        G = 4'b1111;
+        B = 4'b1111;
         #10 rst = 0;
+
     end
 
 endmodule

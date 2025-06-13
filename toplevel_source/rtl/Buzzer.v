@@ -31,11 +31,8 @@ module Buzzer(
 );
     
 
-    parameter SPEED = 4;    //控制演奏的速度，如果是4，频率是4Hz
     //原始的clk频率是50Mhz
-    parameter COUNTER_6M = 50_000_000 / 6_000_000 /2 - 1;
-    parameter COUNTER_SPEED = 50_000_000 / SPEED /2 - 1;
-    parameter LENGTH = 22;
+    parameter COUNTER_6M = 50_000_000 / 6_000_000 /2 - 1; //6Mhz计数器的计数值
 
     parameter REST = 16383; //也即2^14-1 用表达式表示是(1<<14)-1 注意运算符优先级 单目>算数>移位>关系>按位>逻辑
 
@@ -80,21 +77,7 @@ module Buzzer(
         end
     end
 
-    reg [23:0] cnt_SPEED;
     reg [23:0] cnt_hz;
-    reg clk_SPEED;
-
-    always@(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            cnt_SPEED <= 0;
-            clk_SPEED <= 0;
-        end else if(cnt_SPEED == COUNTER_SPEED) begin
-            cnt_SPEED <= 0;
-            clk_SPEED <= ~clk_SPEED;
-        end else begin
-            cnt_SPEED <= cnt_SPEED + 1;
-        end
-    end
 
     reg [13:0] cnt;
 
@@ -110,7 +93,7 @@ module Buzzer(
         end
     end
 
-    //在clk_SPEED上计时，根据music_scale选择对应的音调， 当SPEED为4时，每个音调都至少持续0.25s
+    
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             cnt_hz <= REST;
@@ -144,7 +127,6 @@ module Buzzer(
                 default: cnt_hz <= REST;
             endcase
 
-            
         end
     end
 
