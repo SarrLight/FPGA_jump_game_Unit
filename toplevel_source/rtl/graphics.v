@@ -79,10 +79,10 @@ module graphics(
 
     //为什么是大于0而不是大于等于零？因为0的时候输出的图形由上一个clk的dout决定，所以把他舍弃了
     assign en_block1 = i_en_block1 && addr_x_img_block1>15'd0 && addr_x_img_block1<15'd180 
-        && addr_y_img_block1>=15'd0 && addr_y_img_block1<15'd180;
+        && addr_y_img_block1>15'd0 && addr_y_img_block1<15'd180;
     assign en_block2 = i_en_block2 && addr_x_img_block2>15'd0 && addr_x_img_block2<15'd180 
-        && addr_y_img_block2>=15'd0 && addr_y_img_block2<15'd180;
-    assign en_man = addr_x_img_jump>=17'd0 && addr_x_img_jump<17'd50 
+        && addr_y_img_block2>15'd0 && addr_y_img_block2<15'd180;
+    assign en_man = addr_x_img_jump>17'd0 && addr_x_img_jump<17'd50 
         && addr_y_img_jump>17'd0 && addr_y_img_jump<17'd100;
     assign en_title = i_title && addr_x_img_title>0 && addr_x_img_title<493 
         && addr_y_img_title>0 && addr_y_img_title<144;
